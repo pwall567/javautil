@@ -9,6 +9,35 @@
   <version>1.0</version>
   <name>Java Utilities</name>
   <description>Java Utilities</description>
+  <packaging>jar</packaging>
+  <url>https://github.com/pwall567/javautil</url>
+
+  <licenses>
+    <license>
+      <name>The MIT License (MIT)</name>
+      <url>http://opensource.org/licenses/MIT</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>https://github.com/pwall567/javautil.git</connection>
+    <url>https://github.com/pwall567/javautil.git</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>pwall@pwall.net</id>
+      <name>Peter Wall</name>
+      <email>pwall@pwall.net</email>
+      <url>http://pwall.net</url>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>Australia/Sydney</timezone>
+    </developer>
+  </developers>
 
   <build>
     <plugins>
@@ -20,6 +49,32 @@
           <target>1.7</target>
         </configuration>
       </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.7</version>
+          <executions>
+            <execution>
+              <id>attach-javadoc</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.1.2</version>
+          <executions>
+            <execution>
+              <id>attach-source</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
     </plugins>
   </build>
 
