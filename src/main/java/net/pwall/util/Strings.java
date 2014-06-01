@@ -42,45 +42,6 @@ public class Strings {
     private static final String emptyString = "";
     private static final String[] emptyStringArray = {};
 
-    public static String[] splitRecursive(String s) {
-        return splitRecursive(s, 0, s.length(), 0);
-    }
-
-    public static String[] splitRecursive(String s, int start, int end) {
-        return splitRecursive(s, start, end, 0);
-    }
-
-    public static String[] splitRecursive(String s, int i, int end, int offset) {
-        for (;;) {
-            if (i >= end)
-                return offset == 0 ? emptyStringArray : new String[offset];
-            if (!Character.isWhitespace(s.charAt(i)))
-                break;
-            i++;
-        }
-        int tokenStart = i;
-//        for (;;) {
-//            if (++i >= end) {
-//                String[] result = new String[offset + 1];
-//                result[offset] = s.substring(tokenStart, i);
-//                return result;
-//            }
-//            if (Character.isWhitespace(s.charAt(i))) {
-//                String[] result = splitRecursive(s, i + 1, end, offset + 1);
-//                result[offset] = s.substring(tokenStart, i);
-//                return result;
-//            }
-//        }
-        int j = i;
-        int k = end;
-        while (++j < k && !Character.isWhitespace(s.charAt(j)))
-            ;
-        String[] result = j < k ? splitRecursive(s, j + 1, k, offset + 1) :
-                new String[offset + 1];
-        result[offset] = s.substring(tokenStart, j);
-        return result;
-    }
-
     /**
      * Split a string into white space delimited tokens, where white space is determined by
      * {@link Character#isWhitespace(char)}.
@@ -105,42 +66,6 @@ public class Strings {
      * @throws       IndexOutOfBoundsException if {@code start} or {@code end} is invalid
      */
     public static String[] split(String s, int start, int end) {
-//        for (;;) {
-//            if (start >= end)
-//                return emptyStringArray;
-//            if (!Character.isWhitespace(s.charAt(start)))
-//                break;
-//            start++;
-//        }
-//        while (Character.isWhitespace(s.charAt(--end)))
-//            ;
-//        int count = 0, i = start + 1;
-//    outer:
-//        for (;;) {
-//            for (;;) {
-//                if (i >= end)
-//                    break outer;
-//                if (Character.isWhitespace(s.charAt(i++)))
-//                    break;
-//            }
-//            count++;
-//            while (Character.isWhitespace(s.charAt(i++)))
-//                ;
-//        }
-//        String[] result = new String[count + 1];
-//        i = start;
-//        for (int j = 0; j < count; j++) {
-//            int k = i;
-//            do {
-//                i++;
-//            } while (!Character.isWhitespace(s.charAt(i)));
-//            result[j] = s.substring(k, i);
-//            do {
-//                i++;
-//            } while (Character.isWhitespace(s.charAt(i)));
-//        }
-//        result[count] = s.substring(i, end + 1);
-//        return result;
         return split(s, start, end, defaultSpaceTest);
     }
 
@@ -963,6 +888,13 @@ public class Strings {
         return bab.toByteArray();
     }
 
+    /**
+     * Convert a {@link CharSequence} to hexadecimal.
+     *
+     * @param   s       the {@link CharSequence}
+     * @return          the converted string
+     * @throws          IllegalArgumentException if the {@link CharSequence} is {@code null}
+     */
     public static String toHex(CharSequence s) {
         if (s == null)
             throw new IllegalArgumentException("argument must not be null");
@@ -981,6 +913,15 @@ public class Strings {
         return sb.toString();
     }
 
+    /**
+     * Convert a {@link CharSequence} to hexadecimal, with a separator between bytes for easier
+     * reading.
+     *
+     * @param   s           the {@link CharSequence}
+     * @param   separator   the separator
+     * @return              the converted string
+     * @throws              IllegalArgumentException if the {@link CharSequence} is {@code null}
+     */
     public static String toHex(CharSequence s, char separator) {
         if (s == null)
             throw new IllegalArgumentException("argument must not be null");
@@ -1003,6 +944,13 @@ public class Strings {
         return sb.toString();
     }
 
+    /**
+     * Convert a byte array to hexadecimal.
+     *
+     * @param   bytes   the byte array
+     * @return          the converted string
+     * @throws          IllegalArgumentException if the byte array is {@code null}
+     */
     public static String toHex(byte[] bytes) {
         if (bytes == null)
             throw new IllegalArgumentException("argument must not be null");
@@ -1021,6 +969,14 @@ public class Strings {
         return sb.toString();
     }
 
+    /**
+     * Convert a byte array to hexadecimal, with a separator between bytes for easier reading.
+     *
+     * @param   bytes       the byte array
+     * @param   separator   the separator
+     * @return              the converted string
+     * @throws              IllegalArgumentException if the byte array is {@code null}
+     */
     public static String toHex(byte[] bytes, char separator) {
         if (bytes == null)
             throw new IllegalArgumentException("argument must not be null");
@@ -1043,6 +999,12 @@ public class Strings {
         return sb.toString();
     }
 
+    /**
+     * Convert a byte to hexadecimal.
+     *
+     * @param   b       the byte
+     * @return          the converted string
+     */
     public static String toHex(byte b) {
         StringBuilder sb = new StringBuilder(2);
         try {
@@ -1054,6 +1016,12 @@ public class Strings {
         return sb.toString();
     }
 
+    /**
+     * Convert a character to hexadecimal.
+     *
+     * @param   ch      the character
+     * @return          the converted string
+     */
     public static String toHex(char ch) {
         StringBuilder sb = new StringBuilder(4);
         try {
@@ -1065,6 +1033,12 @@ public class Strings {
         return sb.toString();
     }
 
+    /**
+     * Convert an integer to hexadecimal.
+     *
+     * @param   i       the integer
+     * @return          the converted string
+     */
     public static String toHex(int i) {
         StringBuilder sb = new StringBuilder(8);
         try {
@@ -1076,6 +1050,12 @@ public class Strings {
         return sb.toString();
     }
 
+    /**
+     * Convert a long to hexadecimal.
+     *
+     * @param   n       the number
+     * @return          the converted string
+     */
     public static String toHex(long n) {
         StringBuilder sb = new StringBuilder(16);
         try {
@@ -1087,25 +1067,56 @@ public class Strings {
         return sb.toString();
     }
 
+    /**
+     * Append a byte value as hexadecimal to an {@link Appendable}.
+     *
+     * @param   a       the {@link Appendable}
+     * @param   n       the byte
+     * @throws IOException if thrown by the {@link Appendable}
+     */
     public static void appendHex(Appendable a, byte b) throws IOException {
         a.append(hexDigits[(b >>> 4) & 0xF]);
         a.append(hexDigits[b & 0xF]);
     }
 
+    /**
+     * Append a character value as hexadecimal to an {@link Appendable}.
+     *
+     * @param   a       the {@link Appendable}
+     * @param   n       the character
+     * @throws IOException if thrown by the {@link Appendable}
+     */
     public static void appendHex(Appendable a, char ch) throws IOException {
         appendHex(a, (byte)(ch >>> 8));
         appendHex(a, (byte)ch);
     }
 
+    /**
+     * Append an integer value as hexadecimal to an {@link Appendable}.
+     *
+     * @param   a       the {@link Appendable}
+     * @param   n       the number
+     * @throws IOException if thrown by the {@link Appendable}
+     */
     public static void appendHex(Appendable a, int i) throws IOException {
         appendHex(a, (char)(i >>> 16));
         appendHex(a, (char)i);
     }
 
+    /**
+     * Append a long value as hexadecimal to an {@link Appendable}.
+     *
+     * @param   a       the {@link Appendable}
+     * @param   n       the number
+     * @throws IOException if thrown by the {@link Appendable}
+     */
     public static void appendHex(Appendable a, long n) throws IOException {
         appendHex(a, (int)(n >>> 32));
         appendHex(a, (int)n);
     }
+
+    private static final int MAX_INT_DIV_10 = Integer.MAX_VALUE / 10;
+    private static final int MAX_INT_MOD_10 = Integer.MAX_VALUE % 10;
 
     /**
      * Convert a group of digits in a {@link CharSequence} to an {@code int}.
@@ -1124,12 +1135,15 @@ public class Strings {
         int result = 0;
         for (int i = start; i < end; i++) {
             int n = convertDecDigit(text.charAt(i));
-            if (result > 214748364 || result == 214748364 && n > 7)
+            if (result > MAX_INT_DIV_10 || result == MAX_INT_DIV_10 && n > MAX_INT_MOD_10)
                 throw new NumberFormatException();
             result = result * 10 + n;
         }
         return result;
     }
+
+    private static final long MAX_LONG_DIV_10 = Long.MAX_VALUE / 10;
+    private static final int MAX_LONG_MOD_10 = (int)(Long.MAX_VALUE % 10);
 
     /**
      * Convert a group of digits in a {@link CharSequence} to a {@code long}.
@@ -1148,7 +1162,7 @@ public class Strings {
         long result = 0;
         for (int i = start; i < end; i++) {
             int n = convertDecDigit(text.charAt(i));
-            if (result > 922337203685477580L || result == 922337203685477580L && n > 7)
+            if (result > MAX_LONG_DIV_10 || result == MAX_LONG_DIV_10 && n > MAX_LONG_MOD_10)
                 throw new NumberFormatException();
             result = result * 10 + n;
         }
@@ -1158,9 +1172,9 @@ public class Strings {
     /**
      * Convert a decimal digit to the integer value of the digit.
      *
-     * @param ch    the decimal digit
-     * @return      the integer value (0 - 9)
-     * @throws      NumberFormatException if the digit is not valid
+     * @param   ch      the decimal digit
+     * @return          the integer value (0 - 9)
+     * @throws          NumberFormatException if the digit is not valid
      */
     public static int convertDecDigit(char ch) {
         if (ch >= '0' && ch <= '9')
@@ -1184,7 +1198,7 @@ public class Strings {
             throw new IndexOutOfBoundsException();
         int result = 0;
         for (int i = start; i < end; i++) {
-            if ((result & 0xF0000000) != 0)
+            if ((result & 0xF8000000) != 0)
                 throw new NumberFormatException();
             result = result << 4 | convertHexDigit(text.charAt(i));
         }
@@ -1207,7 +1221,7 @@ public class Strings {
             throw new IndexOutOfBoundsException();
         long result = 0;
         for (int i = start; i < end; i++) {
-            if ((result & 0xF000000000000000L) != 0)
+            if ((result & 0xF800000000000000L) != 0)
                 throw new NumberFormatException();
             result = result << 4 | convertHexDigit(text.charAt(i));
         }
@@ -1217,9 +1231,9 @@ public class Strings {
     /**
      * Convert a hexadecimal digit to the integer value of the digit.
      *
-     * @param ch    the hexadecimal digit
-     * @return      the integer value (0 - 15)
-     * @throws      NumberFormatException if the digit is not valid
+     * @param   ch      the hexadecimal digit
+     * @return          the integer value (0 - 15)
+     * @throws          NumberFormatException if the digit is not valid
      */
     public static int convertHexDigit(char ch) {
         if (ch >= '0' && ch <= '9')
@@ -1231,6 +1245,18 @@ public class Strings {
         throw new NumberFormatException();
     }
 
+    /**
+     * Perform multi-wildcard comparison.  The pattern string consists of multiple wildcard
+     * patterns (using <code>?</code> for single character matches and <code>*</code> for
+     * multiple character matches) separated by vertical bar (logical or) characters.  The
+     * comparison returns {@code true} if any of the patterns match the target.
+     *
+     * @param   pattern the pattern string as described above
+     * @param   target  the target {@link CharSequence} ({@link String}, {@link StringBuilder},
+     *                  {@link StringBuffer} etc.)
+     * @return          {@code true} if the target string matches the pattern
+     * @see             
+     */
     public static boolean multiWildcardCompare(String pattern, CharSequence target) {
         int patIndex = 0;
         for (;;) {
@@ -1256,39 +1282,13 @@ public class Strings {
      *   <dd>matches the same character exactly</dd>
      * </dl>
      *
-     * @param pattern  the pattern string, which may include wildcard characters as described
-     *                 above
-     * @param target   the target {@link CharSequence} ({@link String}, {@link StringBuilder},
-     *                 {@link StringBuffer} etc.)
-     * @return         {@code true} if the target string matches the pattern
+     * @param   pattern the pattern string, which may include wildcard characters as described
+     *                  above
+     * @param   target  the target {@link CharSequence} ({@link String}, {@link StringBuilder},
+     *                  {@link StringBuffer} etc.)
+     * @return          {@code true} if the target string matches the pattern
      */
     public static boolean wildcardCompare(String pattern, CharSequence target) {
-//        int tarLen = target.length();
-//        int patLen = pattern.length();
-//        int i = pattern.indexOf('*');
-//        if (i < 0)
-//            return tarLen == patLen && wildcardCompareSubstring(pattern, 0, tarLen, target, 0);
-//        if (i > tarLen || !wildcardCompareSubstring(pattern, 0, i, target, 0))
-//            return false;
-//        int tarIndex = i;
-//        int patIndex = i + 1;
-//        for (;;) {
-//            i = pattern.indexOf('*', patIndex);
-//            if (i < 0)
-//                break;
-//            i -= patIndex; // i is now length of substring before next *
-//            for (;;) {
-//                if (tarIndex + i > tarLen)
-//                    return false;
-//                if (wildcardCompareSubstring(pattern, patIndex, patIndex + i, target, tarIndex))
-//                    break;
-//                tarIndex++;
-//            }
-//            tarIndex += i;
-//            patIndex += i + 1;
-//        }
-//        i = tarLen - (patLen - patIndex); // offset within target
-//        return tarIndex <= i && wildcardCompareSubstring(pattern, patIndex, patLen, target, i);
         return wildcardCompare(pattern, 0, pattern.length(), target);
     }
 
@@ -1306,13 +1306,13 @@ public class Strings {
      * This version allows a substring of the pattern string to be specified, removing the
      * necessity for a separate {@link String#substring(int, int)} operation.
      *
-     * @param pattern  the pattern string, which may include wildcard characters as described
-     *                 above
-     * @param patIndex the start index within the pattern string
-     * @param patEnd   the end index within the pattern string
-     * @param target   the target {@link CharSequence} ({@link String}, {@link StringBuilder},
-     *                 {@link StringBuffer} etc.)
-     * @return         {@code true} if the target string matches the pattern
+     * @param   pattern     the pattern string, which may include wildcard characters as
+     *                      described above
+     * @param   patIndex    the start index within the pattern string
+     * @param   patEnd      the end index within the pattern string
+     * @param   target      the target {@link CharSequence} ({@link String},
+     *                      {@link StringBuilder}, {@link StringBuffer} etc.)
+     * @return              {@code true} if the target string matches the pattern
      */
     public static boolean wildcardCompare(String pattern, int patIndex, int patEnd,
             CharSequence target) {
@@ -1349,13 +1349,13 @@ public class Strings {
      * not <code>*</code> characters, so the pattern and target substrings must be the same
      * length.
      *
-     * @param pattern   the pattern string
-     * @param patIndex  the index of the substring within the pattern string
-     * @param patEnd    the end index of the substring within the pattern string
-     * @param target    the target {@link CharSequence} ({@link String}, {@link StringBuilder},
-     *                  {@link StringBuffer} etc.)
-     * @param index     the index of the substring within the target
-     * @return          {@code true} if the substrings match
+     * @param   pattern     the pattern string
+     * @param   patIndex    the index of the substring within the pattern string
+     * @param   patEnd      the end index of the substring within the pattern string
+     * @param   target      the target {@link CharSequence} ({@link String},
+     *                      {@link StringBuilder}, {@link StringBuffer} etc.)
+     * @param   index       the index of the substring within the target
+     * @return              {@code true} if the substrings match
      */
     private static boolean wildcardCompareSubstring(String pattern, int patIndex, int patEnd,
             CharSequence target, int index) {
