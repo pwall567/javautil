@@ -335,15 +335,28 @@ public class ISO8601Date extends Date {
         return value;
     }
 
+    /**
+     * Convert a {@link Calendar} object to an ISO 8601 string.  This function outputs to the
+     * string only those fields that are marked as having been set explicitly.
+     *
+     * <p>The "extended" format will be used, that is, date and time separators will be
+     * included.</p>
+     *
+     * @param   cal         a {@link Calendar} object
+     * @return  the date represented by the {@link Calendar} in ISO 8601 format
+     */
     public static String toString(Calendar cal) {
         return toString(cal, true);
     }
 
     /**
-     * 
-     * @param cal
-     * @param extended
-     * @return
+     * Convert a {@link Calendar} object to an ISO 8601 string.  This function outputs to the
+     * string only those fields that are marked as having been set explicitly.
+     *
+     * @param   cal         a {@link Calendar} object
+     * @param   extended    if {@code true}, use "extended" format (include date and time
+     *                      separators)
+     * @return  the date represented by the {@link Calendar} in ISO 8601 format
      */
     public static String toString(Calendar cal, boolean extended) {
         boolean yearSet = cal.isSet(Calendar.YEAR);
@@ -416,11 +429,9 @@ public class ISO8601Date extends Date {
                 mins = Math.abs(mins);
                 append2Digit(sb, mins / 60);
                 mins %= 60;
-//                if (mins != 0) {
-                    if (extended)
-                        sb.append(timeSeparator);
-                    append2Digit(sb, mins);
-//                }
+                if (extended)
+                    sb.append(timeSeparator);
+                append2Digit(sb, mins);
             }
         }
         return sb.toString();
@@ -461,10 +472,5 @@ public class ISO8601Date extends Date {
         }
         sb.append(n);
     }
-
-//    private static String threeDigit(int n) {
-//        n = Math.abs(n) % 1_000;
-//        return n < 10 ? "00" + n : n < 100 ? "0" + n : String.valueOf(n);
-//    }
 
 }

@@ -42,8 +42,8 @@ import java.text.MessageFormat;
 public class UserError extends RuntimeException {
 
     private static final long serialVersionUID = -7953470627573715294L;
-    
-    public static final String formatKey = "net.pwall.util.UserError.format";
+
+    public static final String formatKey = UserError.class.getName() + ".format";
     public static final String defaultFormat = "Error: {0}";
 
     /**

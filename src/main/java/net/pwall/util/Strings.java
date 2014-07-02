@@ -36,6 +36,12 @@ import java.util.Iterator;
  */
 public class Strings {
 
+    private static final String[] numberNamesEnglish = { "zero", "one", "two", "three", "four",
+            "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen",
+            "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" };
+    private static final String[] tensNamesEnglish = { "ten", "twenty", "thirty", "forty",
+            "fifty", "sixty", "seventy", "eighty", "ninety" };
+
     private static char[] hexDigits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
             'B', 'C', 'D', 'E', 'F' };
 
@@ -43,12 +49,98 @@ public class Strings {
     private static final String[] emptyStringArray = {};
 
     /**
+     * Convert a number to words in English.
+     *
+     * @param   n       the number
+     * @return          a string containing the number in words
+     */
+    public static String toEnglish(int n) {
+        n = Math.abs(n);
+        if (n < 20)
+            return numberNamesEnglish[n]; // avoids allocating StringBuilder and handles zero
+        StringBuilder sb = new StringBuilder();
+        try {
+            appendEnglish(sb, n);
+        }
+        catch (IOException e) {
+            // can't happen - StringBuilder does not throw IOException
+        }
+        return sb.toString();
+    }
+
+    public static void appendEnglish(Appendable a, int n) throws IOException {
+        n = Math.abs(n);
+        if (n < 20) {
+            a.append(numberNamesEnglish[n]);
+            return;
+        }
+    concat: {
+            if (n >= 1_000_000_000) { // 32-bit int can't be greater than five billion
+                appendEnglish(a, n / 1_000_000_000);
+                a.append(" billion");
+                if ((n %= 1_000_000_000) == 0)
+                    break concat;
+                a.append(n >= 100 ? ", " : " and ");
+            }
+            if (n >= 1_000_000) {
+                appendEnglish(a, n / 1_000_000);
+                a.append(" million");
+                if ((n %= 1_000_000) == 0)
+                    break concat;
+                a.append(n >= 100 ? ", " : " and ");
+            }
+            if (n >= 1_000) {
+                appendEnglish(a, n / 1_000);
+                a.append(" thousand");
+                if ((n %= 1_000) == 0)
+                    break concat;
+                a.append(n >= 100 ? ", " : " and ");
+            }
+            if (n >= 100) {
+                a.append(numberNamesEnglish[n / 100]).append(" hundred");
+                if ((n %= 100) == 0)
+                    break concat;
+                a.append(" and ");
+            }
+            if (n >= 20) {
+                a.append(tensNamesEnglish[n / 10 - 1]);
+                if ((n %= 10) != 0)
+                    a.append('-');
+            }
+            if (n > 0)
+                a.append(numberNamesEnglish[n]);
+        }
+    }
+
+    /**
+     * Capitalise the first letter of a string.  If the first character is not a lower-case
+     * letter the string is returned unmodified.
+     *
+     * @param   str     the input string
+     * @return          the string, with the first letter capitalised
+     */
+    public static String capitalise(String str) {
+        int n = str.length();
+        if (n > 0) {
+            char ch = str.charAt(0);
+            if (Character.isLowerCase(ch)) {
+                StringBuilder sb = new StringBuilder(n);
+                sb.append(Character.toUpperCase(ch));
+                if (n > 1)
+                    sb.append(str, 1, n);
+                return sb.toString();
+            }
+        }
+        return str;
+    }
+
+    /**
      * Split a string into white space delimited tokens, where white space is determined by
      * {@link Character#isWhitespace(char)}.
      *
-     * @param s  the string to be split
-     * @return   an array of tokens (possibly empty)
-     * @throws   NullPointerException if the input string is {@code null}
+     * @param   s       the string to be split
+     * @return          an array of tokens (possibly empty)
+     * @throws          NullPointerException if the input string is {@code null}
      */
     public static String[] split(String s) {
         return split(s, 0, s.length(), defaultSpaceTest);
@@ -58,12 +150,12 @@ public class Strings {
      * Split a portion of a string into white space delimited tokens, where white space is
      * determined by {@link Character#isWhitespace(char)}.
      *
-     * @param s      the string to be split
-     * @param start  the start index of the portion to be examined
-     * @param end    the end index (exclusive) of the portion to be examined
-     * @return       an array of tokens (possibly empty)
-     * @throws       NullPointerException if the input string is {@code null}
-     * @throws       IndexOutOfBoundsException if {@code start} or {@code end} is invalid
+     * @param   s       the string to be split
+     * @param   start   the start index of the portion to be examined
+     * @param   end     the end index (exclusive) of the portion to be examined
+     * @return          an array of tokens (possibly empty)
+     * @throws          NullPointerException if the input string is {@code null}
+     * @throws          IndexOutOfBoundsException if {@code start} or {@code end} is invalid
      */
     public static String[] split(String s, int start, int end) {
         return split(s, start, end, defaultSpaceTest);
@@ -77,6 +169,7 @@ public class Strings {
      * </pre>
      *
      * @param   s       the string to be split
+     * @param   st      the {@link SpaceTest}
      * @return          an array of tokens (possibly empty)
      * @throws          NullPointerException if the input string is {@code null}
      */
@@ -91,11 +184,13 @@ public class Strings {
      * @param   s       the string to be split
      * @param   start   the start index of the portion to be examined
      * @param   end     the end index (exclusive) of the portion to be examined
+     * @param   st      the {@link SpaceTest}
      * @return          an array of tokens (possibly empty)
      * @throws          NullPointerException if the input string is {@code null}
      * @throws          IndexOutOfBoundsException if {@code start} or {@code end} is invalid
      */
     public static String[] split(String s, int start, int end, SpaceTest st) {
+        // first, trim spaces from the start of the string; if we hit end, return empty array
         for (;;) {
             if (start >= end)
                 return emptyStringArray;
@@ -103,8 +198,10 @@ public class Strings {
                 break;
             start++;
         }
+        // now trim spaces from end (by this stage, we know there's at least one non-space)
         while (st.isSpace(s.charAt(--end)))
             ;
+        // first pass through the string to count the number of internal groups of spaces
         int count = 0, i = start + 1;
     outer:
         for (;;) {
@@ -118,18 +215,24 @@ public class Strings {
             while (st.isSpace(s.charAt(i++)))
                 ;
         }
+        // result array size is number of separators plus 1
         String[] result = new String[count + 1];
+        // for each result entry prior to the last...
         i = start;
         for (int j = 0; j < count; j++) {
+            // store start index and skip past non-space
             int k = i;
             do {
                 i++;
             } while (!st.isSpace(s.charAt(i)));
+            // add result substring to array
             result[j] = s.substring(k, i);
+            // and skip past spaces
             do {
                 i++;
             } while (st.isSpace(s.charAt(i)));
         }
+        // the last entry consists of the remainder of the (trimmed) string
         result[count] = s.substring(i, end + 1);
         return result;
     }
@@ -164,42 +267,47 @@ public class Strings {
      * @throws              NullPointerException if the input string is {@code null}
      */
     public static String[] split(String s, char separator) {
-        return split(s, 0, s.length(), separator, true, true);
+        return split(s, 0, s.length(), separator, true, defaultSpaceTest);
     }
 
     /**
-     * Split a string on a given separator.
+     * Split a string on a given separator character.  Spaces may optionally be trimmed from
+     * both ends of the items using the supplied space test, and zero-length items (after
+     * optional trimming) may optionally be dropped.
      *
      * @param   s           the string to be split
      * @param   separator   the separator
-     * @param   trim        if {@code true}, trim spaces off both ends of each item
      * @param   skipEmpty   if {@code true}, ignore zero-length items (possibly after trimming)
+     * @param   spaceTest   if not {@code null}, use to trim spaces off both ends of each item
      * @return              an array of items (possibly empty)
      * @throws              NullPointerException if the input string is {@code null}
      */
-    public static String[] split(String s, char separator, boolean trim, boolean skipEmpty) {
-        return split(s, 0, s.length(), separator, trim, skipEmpty);
+    public static String[] split(String s, char separator, boolean skipEmpty,
+            SpaceTest spaceTest) {
+        return split(s, 0, s.length(), separator, skipEmpty, spaceTest);
     }
 
     /**
-     * Split a portion of a string on a given separator.
+     * Split a portion of a string on a given separator character.  Spaces may optionally be
+     * trimmed from both ends of the items using the supplied space test, and zero-length items
+     * (after optional trimming) may optionally be dropped.
      *
      * @param   s           the string to be split
      * @param   start       the start index of the portion to be examined
      * @param   end         the end index (exclusive) of the portion to be examined
      * @param   separator   the separator
-     * @param   trim        if {@code true}, trim spaces off both ends of each item
      * @param   skipEmpty   if {@code true}, ignore zero-length items (possibly after trimming)
+     * @param   spaceTest   if not {@code null}, use to trim spaces off both ends of each item
      * @return              an array of items (possibly empty)
      * @throws              NullPointerException if the input string is {@code null}
      * @throws              IndexOutOfBoundsException if {@code start} or {@code end} is invalid
      */
-    public static String[] split(String s, int start, int end, char separator, boolean trim,
-            boolean skipEmpty) {
+    public static String[] split(String s, int start, int end, char separator,
+            boolean skipEmpty, SpaceTest spaceTest) {
         int count = 0;
         int i = start;
         if (skipEmpty) {
-            if (trim) {
+            if (spaceTest != null) {
                 // count the number of items (ignoring zero-length or all space items)
                 for (;;) {
                     boolean nonSpaceSeen = false;
@@ -207,7 +315,7 @@ public class Strings {
                         char ch = s.charAt(i);
                         if (ch == separator)
                             break;
-                        nonSpaceSeen = nonSpaceSeen || !Character.isWhitespace(ch);
+                        nonSpaceSeen = nonSpaceSeen || !spaceTest.isSpace(ch);
                         i++;
                     }
                     if (nonSpaceSeen)
@@ -249,10 +357,10 @@ public class Strings {
             while (i < end && s.charAt(i) != separator)
                 i++;
             int itemEnd = i;
-            if (trim) {
-                while (itemStart < itemEnd && Character.isWhitespace(s.charAt(itemStart)))
+            if (spaceTest != null) {
+                while (itemStart < itemEnd && spaceTest.isSpace(s.charAt(itemStart)))
                     itemStart++;
-                while (itemStart < itemEnd && Character.isWhitespace(s.charAt(itemEnd - 1)))
+                while (itemStart < itemEnd && spaceTest.isSpace(s.charAt(itemEnd - 1)))
                     itemEnd--;
             }
             if (itemEnd > itemStart)

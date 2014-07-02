@@ -173,11 +173,34 @@ public class ParseText {
      *
      * @return  the current character
      * @throws  StringIndexOutOfBoundsException if the index is at or beyond end of string
+     * @deprecated      use {@link #getCodePoint()} instead
      */
+    @Deprecated
     public char getChar() {
         if (index >= text.length())
             throw new StringIndexOutOfBoundsException("ParseText exhausted");
         return text.charAt(index);
+    }
+
+    /**
+     * Get the Unicode code point at the current character index.
+     *
+     * @return  the code point
+     * @throws  StringIndexOutOfBoundsException if the index is at or beyond end of string
+     */
+    public int getCodePoint() {
+        start = index;
+        if (index >= text.length())
+            throw new StringIndexOutOfBoundsException("ParseText exhausted");
+        char ch = text.charAt(index++);
+        if (Character.isHighSurrogate(ch) && index < text.length()) {
+            char ch2 = text.charAt(index);
+            if (Character.isLowSurrogate(ch2)) {
+                index++;
+                return (Character.toCodePoint(ch, ch2));
+            }
+        }
+        return ch;
     }
 
     /**
@@ -420,13 +443,42 @@ public class ParseText {
     /**
      * Get a specific character from the text.
      *
-     * @param index the index of the character
-     * @return      the character at the specified index
-     * @throws      IndexOutOfBoundsException if the index is negative or beyond the end of the
-     *              text
+     * @param   index   the index of the character
+     * @return  the character at the specified index
+     * @throws  IndexOutOfBoundsException if the index is negative or beyond the end of the text
      */
     public char charAt(int index) {
         return text.charAt(index);
+    }
+
+    /**
+     * Match the current character in the text against a given Unicode code point.  Following a
+     * successful match the start index will point to the matched code point and the index will
+     * be incremented past it.
+     *
+     * @param   cp      the code point to match against
+     * @return  {@code true} if the code point in the text matches the given character
+     */
+    public boolean match(int cp) {
+        int i = index;
+        if (i >= text.length())
+            return false;
+        char ch = text.charAt(i++);
+        if (Character.isHighSurrogate(ch)) {
+            if (i >= text.length())
+                return false;
+            char ch2 = text.charAt(i++);
+            if (!Character.isLowSurrogate(ch2))
+                return false;
+            if (Character.toCodePoint(ch, ch2) != cp)
+                return false;
+        }
+        else
+            if (ch != cp)
+                return false;
+        start = index;
+        index = i;
+        return true;
     }
 
     /**
@@ -434,8 +486,8 @@ public class ParseText {
      * successful match the start index will point to the matched character and the index will
      * be incremented past it.
      *
-     * @param ch  the character to match against
-     * @return    {@code true} if the character in the text matches the given character
+     * @param   ch      the character to match against
+     * @return  {@code true} if the character in the text matches the given character
      */
     public boolean match(char ch) {
         if (index >= text.length() || text.charAt(index) != ch)
@@ -794,8 +846,8 @@ public class ParseText {
     }
 
     /**
-     * Increment the index to the next occurence of the given character.  The index is left
-     * positioned at the stopper character.
+     * Increment the index to the next occurrence of the given character.  The index is left
+     * positioned at the matched character.
      *
      * @param   ch      the stopper character
      * @return          the {@code ParseText} object (for chaining purposes)
@@ -810,8 +862,8 @@ public class ParseText {
     }
 
     /**
-     * Increment the index to the next occurence of any of the given characters.  The index is
-     * left positioned at the stopper character.
+     * Increment the index to the next occurrence of any of the given characters.  The index is
+     * left positioned at the matched character.
      *
      * @param   array   the array of possible stopper characters
      * @return          the {@code ParseText} object (for chaining purposes)
@@ -832,7 +884,7 @@ public class ParseText {
     }
 
     /**
-     * Increment the index to the next occurence of any of the given characters.  The index is
+     * Increment the index to the next occurrence of any of the given characters.  The index is
      * left positioned at the stopper character.
      *
      * @param   stoppers    a {@link CharSequence} of possible stopper characters
@@ -854,7 +906,7 @@ public class ParseText {
     }
 
     /**
-     * Increment the index to the next occurence of the stopper sequence.  The index is left
+     * Increment the index to the next occurrence of the stopper sequence.  The index is left
      * positioned at the stopper sequence.
      *
      * @param   target  the stopper sequence
@@ -921,7 +973,7 @@ public class ParseText {
     /**
      * Increment the index to the next space.
      *
-     * @return      the {@code ParseText} object (for chaining purposes)
+     * @return  the {@code ParseText} object (for chaining purposes)
      */
     public ParseText skipToSpace() {
         int i = index;
@@ -936,7 +988,7 @@ public class ParseText {
     /**
      * Increment the index directly to the end of the text.
      *
-     * @return      the {@code ParseText} object (for chaining purposes)
+     * @return  the {@code ParseText} object (for chaining purposes)
      */
     public ParseText skipToEnd() {
         start = index;
