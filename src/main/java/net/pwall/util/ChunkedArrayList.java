@@ -139,7 +139,7 @@ public class ChunkedArrayList<E> extends AbstractList<E> implements RandomAccess
         int n = outerList.size();
         List<E> innerList;
         if (n == 0 || (innerList = outerList.get(n - 1)).size() == chunkSize) {
-            innerList = new ArrayList<E>(chunkSize);
+            innerList = new ArrayList<>(chunkSize);
             outerList.add(innerList);
         }
         innerList.add(e);
