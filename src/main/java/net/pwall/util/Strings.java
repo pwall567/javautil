@@ -28,6 +28,8 @@ package net.pwall.util;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.function.IntPredicate;
 
 /**
  * String utility functions.
@@ -143,7 +145,7 @@ public class Strings {
      * @throws          NullPointerException if the input string is {@code null}
      */
     public static String[] split(String s) {
-        return split(s, 0, s.length(), defaultSpaceTest);
+        return split(s, 0, s.length(), Character::isWhitespace);
     }
 
     /**
@@ -158,48 +160,45 @@ public class Strings {
      * @throws          IndexOutOfBoundsException if {@code start} or {@code end} is invalid
      */
     public static String[] split(String s, int start, int end) {
-        return split(s, start, end, defaultSpaceTest);
+        return split(s, start, end, Character::isWhitespace);
     }
 
     /**
      * Split a string into white space delimited tokens, where white space is determined by a
-     * supplied {@link SpaceTest} object.  In Java 8 lambda notation, this may be called by:
-     * <pre>
-     *     String[] array = Strings.split("a b c d e", ch -> Character.isSpace(ch));
-     * </pre>
+     * supplied {@link IntPredicate} functional interface.
      *
-     * @param   s       the string to be split
-     * @param   st      the {@link SpaceTest}
-     * @return          an array of tokens (possibly empty)
-     * @throws          NullPointerException if the input string is {@code null}
+     * @param   s           the string to be split
+     * @param   spaceTest   the {@link IntPredicate}
+     * @return              an array of tokens (possibly empty)
+     * @throws              NullPointerException if the input string is {@code null}
      */
-    public static String[] split(String s, SpaceTest st) {
-        return split(s, 0, s.length(), st);
+    public static String[] split(String s, IntPredicate spaceTest) {
+        return split(s, 0, s.length(), spaceTest);
     }
 
     /**
      * Split a portion of a string into white space delimited tokens, where white space is
-     * determined by a supplied {@link SpaceTest} object.
+     * determined by a supplied {@link IntPredicate} functional interface.
      *
-     * @param   s       the string to be split
-     * @param   start   the start index of the portion to be examined
-     * @param   end     the end index (exclusive) of the portion to be examined
-     * @param   st      the {@link SpaceTest}
-     * @return          an array of tokens (possibly empty)
-     * @throws          NullPointerException if the input string is {@code null}
-     * @throws          IndexOutOfBoundsException if {@code start} or {@code end} is invalid
+     * @param   s           the string to be split
+     * @param   start       the start index of the portion to be examined
+     * @param   end         the end index (exclusive) of the portion to be examined
+     * @param   spaceTest   the {@link IntPredicate}
+     * @return              an array of tokens (possibly empty)
+     * @throws              NullPointerException if the input string is {@code null}
+     * @throws              IndexOutOfBoundsException if {@code start} or {@code end} is invalid
      */
-    public static String[] split(String s, int start, int end, SpaceTest st) {
+    public static String[] split(String s, int start, int end, IntPredicate spaceTest) {
         // first, trim spaces from the start of the string; if we hit end, return empty array
         for (;;) {
             if (start >= end)
                 return emptyStringArray;
-            if (!st.isSpace(s.charAt(start)))
+            if (!spaceTest.test(s.charAt(start)))
                 break;
             start++;
         }
         // now trim spaces from end (by this stage, we know there's at least one non-space)
-        while (st.isSpace(s.charAt(--end)))
+        while (spaceTest.test(s.charAt(--end)))
             ;
         // first pass through the string to count the number of internal groups of spaces
         int count = 0, i = start + 1;
@@ -208,11 +207,11 @@ public class Strings {
             for (;;) {
                 if (i >= end)
                     break outer;
-                if (st.isSpace(s.charAt(i++)))
+                if (spaceTest.test(s.charAt(i++)))
                     break;
             }
             count++;
-            while (st.isSpace(s.charAt(i++)))
+            while (spaceTest.test(s.charAt(i++)))
                 ;
         }
         // result array size is number of separators plus 1
@@ -224,13 +223,13 @@ public class Strings {
             int k = i;
             do {
                 i++;
-            } while (!st.isSpace(s.charAt(i)));
+            } while (!spaceTest.test(s.charAt(i)));
             // add result substring to array
             result[j] = s.substring(k, i);
             // and skip past spaces
             do {
                 i++;
-            } while (st.isSpace(s.charAt(i)));
+            } while (spaceTest.test(s.charAt(i)));
         }
         // the last entry consists of the remainder of the (trimmed) string
         result[count] = s.substring(i, end + 1);
@@ -238,28 +237,9 @@ public class Strings {
     }
 
     /**
-     * An interface to define a space test for the associated {@code split()} functions.  The
-     * interface is named {@code SpaceTest} rather than {@code SeparatorTest} because the
-     * functions that use it treat multiple occurences as equivalent to a single character -
-     * this is generally the required behaviour for spaces but not for, say, commas.
-     * 
-     * @see     Strings#split(String, SpaceTest)
-     * @see     Strings#split(String, int, int, SpaceTest)
-     */
-    //@FunctionalInterface /* TODO uncomment this when Java 8 is available */
-    public static interface SpaceTest {
-        boolean isSpace(char ch);
-    }
-
-    public static final SpaceTest defaultSpaceTest = new SpaceTest() {
-        @Override
-        public boolean isSpace(char ch) {
-            return Character.isWhitespace(ch);
-        }
-    };
-
-    /**
-     * Split a string on a given separator.
+     * Split a string on a given separator character.  Spaces will be trimmed from both ends of
+     * the items using the standard space test, and zero-length items (after trimming) will be
+     * dropped.
      *
      * @param   s           the string to be split
      * @param   separator   the separator
@@ -267,7 +247,7 @@ public class Strings {
      * @throws              NullPointerException if the input string is {@code null}
      */
     public static String[] split(String s, char separator) {
-        return split(s, 0, s.length(), separator, true, defaultSpaceTest);
+        return split(s, 0, s.length(), separator, true, Character::isWhitespace);
     }
 
     /**
@@ -283,7 +263,7 @@ public class Strings {
      * @throws              NullPointerException if the input string is {@code null}
      */
     public static String[] split(String s, char separator, boolean skipEmpty,
-            SpaceTest spaceTest) {
+            IntPredicate spaceTest) {
         return split(s, 0, s.length(), separator, skipEmpty, spaceTest);
     }
 
@@ -303,7 +283,7 @@ public class Strings {
      * @throws              IndexOutOfBoundsException if {@code start} or {@code end} is invalid
      */
     public static String[] split(String s, int start, int end, char separator,
-            boolean skipEmpty, SpaceTest spaceTest) {
+            boolean skipEmpty, IntPredicate spaceTest) {
         int count = 0;
         int i = start;
         if (skipEmpty) {
@@ -315,7 +295,7 @@ public class Strings {
                         char ch = s.charAt(i);
                         if (ch == separator)
                             break;
-                        nonSpaceSeen = nonSpaceSeen || !spaceTest.isSpace(ch);
+                        nonSpaceSeen = nonSpaceSeen || !spaceTest.test(ch);
                         i++;
                     }
                     if (nonSpaceSeen)
@@ -358,9 +338,9 @@ public class Strings {
                 i++;
             int itemEnd = i;
             if (spaceTest != null) {
-                while (itemStart < itemEnd && spaceTest.isSpace(s.charAt(itemStart)))
+                while (itemStart < itemEnd && spaceTest.test(s.charAt(itemStart)))
                     itemStart++;
-                while (itemStart < itemEnd && spaceTest.isSpace(s.charAt(itemEnd - 1)))
+                while (itemStart < itemEnd && spaceTest.test(s.charAt(itemEnd - 1)))
                     itemEnd--;
             }
             if (itemEnd > itemStart)
@@ -1474,6 +1454,128 @@ public class Strings {
                 return false;
         }
         return true;
+    }
+
+    /**
+     * Trim leading and trailing characters from a string, where those characters match a
+     * supplied {@link IntPredicate} functional interface implementation.
+     *
+     * @param   s           the string to be trimmed
+     * @param   charMatch   the {@link IntPredicate}
+     * @return              the trimmed string
+     * @throws              NullPointerException if either argument is {@code null}
+     */
+    public static String trim(String s, IntPredicate charMatch) {
+        Objects.requireNonNull(charMatch);
+        int start = 0;
+        int end = s.length();
+        for (;;) {
+            if (start >= end)
+                return emptyString;
+            if (!charMatch.test(s.charAt(start)))
+                break;
+            start++;
+        }
+        while (charMatch.test(s.charAt(end - 1)))
+            end--;
+        return start == 0 && end == s.length() ? s : s.substring(start, end);
+    }
+
+    /**
+     * Trim leading and trailing characters from a {@link CharSequence}, where those characters
+     * match a supplied {@link IntPredicate} functional interface implementation.
+     *
+     * @param   cs          the {@link CharSequence} to be trimmed
+     * @param   charMatch   the {@link IntPredicate}
+     * @return              the trimmed {@link CharSequence}
+     * @throws              NullPointerException if either argument is {@code null}
+     */
+    public static CharSequence trim(CharSequence cs, IntPredicate charMatch) {
+        Objects.requireNonNull(charMatch);
+        int start = 0;
+        int end = cs.length();
+        for (;;) {
+            if (start >= end)
+                return emptyString;
+            if (!charMatch.test(cs.charAt(start)))
+                break;
+            start++;
+        }
+        while (charMatch.test(cs.charAt(end - 1)))
+            end--;
+        return start == 0 && end == cs.length() ? cs : new SubSequence(cs, start, end);
+    }
+
+    /**
+     * Trim leading and trailing whitespace from a string, where white space is determined by
+     * {@link Character#isWhitespace(char)}.
+     *
+     * @param   s       the string to be trimmed
+     * @return          the trimmed string
+     * @throws          NullPointerException if the input string is {@code null}
+     */
+    public static String trim(String s) {
+        return trim(s, Character::isWhitespace);
+    }
+
+    /**
+     * Trim leading and trailing whitespace from a {@link CharSequence}, where white space is
+     * determined by {@link Character#isWhitespace(char)}.
+     *
+     * @param   cs      the {@link CharSequence} to be trimmed
+     * @return          the trimmed {@link CharSequence}
+     * @throws          NullPointerException if the input {@link CharSequence} is {@code null}
+     */
+    public static CharSequence trim(CharSequence cs) {
+        return trim(cs, Character::isWhitespace);
+    }
+
+    /**
+     * Trim leading and trailing code points from a UTF16 string, where those code points match
+     * a supplied {@link IntPredicate} functional interface implementation.
+     *
+     * @param   s           the string to be trimmed
+     * @param   charMatch   the {@link IntPredicate}
+     * @return              the trimmed string
+     * @throws              NullPointerException if either argument is {@code null}
+     */
+    public static String trimUTF16(String s, IntPredicate charMatch) {
+        Objects.requireNonNull(charMatch);
+        int start = 0;
+        int end = s.length();
+        for (;;) {
+            if (start >= end)
+                return emptyString;
+            char hi = s.charAt(start);
+            if (Character.isHighSurrogate(hi) && start + 1 < end) {
+                char lo = s.charAt(start + 1);
+                if (Character.isLowSurrogate(lo)) {
+                    if (!charMatch.test(Character.toCodePoint(hi, lo)))
+                        break;
+                    start += 2;
+                    continue;
+                }
+            }
+            if (!charMatch.test(hi))
+                break;
+            start++;
+        }
+        while (end > start) {
+            char lo = s.charAt(end - 1);
+            if (Character.isLowSurrogate(lo) && end - 1 > start) {
+                char hi = s.charAt(end - 2);
+                if (Character.isHighSurrogate(hi)) {
+                    if (!charMatch.test(Character.toCodePoint(hi, lo)))
+                        break;
+                    end -= 2;
+                    continue;
+                }
+            }
+            if (!charMatch.test(lo))
+                break;
+            end--;
+        }
+        return start == 0 && end == s.length() ? s : s.substring(start, end);
     }
 
 }
