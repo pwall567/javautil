@@ -27,6 +27,7 @@ package net.pwall.util;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.function.IntPredicate;
 
 /**
  * A class to assist with text parsing.  A {@code ParseText} object contains a string of text to
@@ -497,6 +498,43 @@ public class ParseText {
     }
 
     /**
+     * Match the current character in the text against a given predicate.  Following a
+     * successful match the start index will point to the matched character and the index will
+     * be incremented past it.
+     *
+     * @param   charMatch   the predicate to match against
+     * @return  {@code true} if the character in the text matches the given predicate
+     */
+    public boolean match(IntPredicate charMatch) {
+        if (index >= text.length() || !charMatch.test(text.charAt(index)))
+            return false;
+        start = index++;
+        return true;
+    }
+
+    /**
+     * Match one or more characters at the index against a given predicate.  Following a
+     * successful match the start index will point to the first matched character and the index
+     * will be incremented past the last character.
+     *
+     * @param   charMatch   the predicate to match against
+     * @return  {@code true} if one or more characters in the text at the index match the
+     *          predicate.
+     */
+    public boolean matchMultiple(IntPredicate charMatch) {
+        int i = index;
+        int len = text.length();
+        if (i >= len || !charMatch.test(text.charAt(i)))
+            return false;
+        start = i;
+        do {
+            i++;
+        } while (i < len && charMatch.test(text.charAt(i)));
+        index = i;
+        return true;
+    }
+
+    /**
      * Match the current character in the text against a given character, ignoring case.
      * Following a successful match the start index will point to the matched character and the
      * index will be incremented past it.
@@ -856,6 +894,40 @@ public class ParseText {
         int i = index;
         start = i;
         while (i < text.length() && text.charAt(i) != ch)
+            i++;
+        index = i;
+        return this;
+    }
+
+    /**
+     * Increment the index to the next occurrence of a character that matches the given
+     * predicate.  The index is left positioned at the matched character.
+     *
+     * @param   charMatch   the predicate
+     * @return              the {@code ParseText} object (for chaining purposes)
+     */
+    public ParseText skipTo(IntPredicate charMatch) {
+        int i = index;
+        start = i;
+        int len = text.length();
+        while (i < len && !charMatch.test(text.charAt(i)))
+            i++;
+        index = i;
+        return this;
+    }
+
+    /**
+     * Increment the index past zero or more characters that match the given predicate.  The
+     * index is left positioned at first non-matching character.
+     *
+     * @param   charMatch   the predicate
+     * @return              the {@code ParseText} object (for chaining purposes)
+     */
+    public ParseText skipPast(IntPredicate charMatch) {
+        int i = index;
+        start = i;
+        int len = text.length();
+        while (i < len && charMatch.test(text.charAt(i)))
             i++;
         index = i;
         return this;
