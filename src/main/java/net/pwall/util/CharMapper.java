@@ -28,16 +28,13 @@ package net.pwall.util;
 /**
  * Character mapper interface for "escape" functions.
  *
- * <p>This is a Functional Interface in Java 8 terms; once Java 8 is widely available the
- * annotation may be uncommented.</p>
- *
  * @author  Peter Wall
  * @see     Strings#escape(CharSequence, CharMapper)
  * @see     Strings#escape(String, CharMapper)
  * @see     Strings#escapeUTF16(CharSequence, CharMapper)
  * @see     Strings#escapeUTF16(String, CharMapper)
  */
-//@FunctionalInterface
+@FunctionalInterface
 public interface CharMapper {
 
     /**
