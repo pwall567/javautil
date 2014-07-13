@@ -58,6 +58,20 @@ public class ISO8601Date extends Date {
     private static final char minusSign = '-';
     private static final char[] plusOrMinus = { plusSign, minusSign };
 
+    // Mask values for calendar fields - these are the same values used in the Calendar class,
+    // but for some reason that class does not make them public
+    public final static int YEAR_MASK          = (1 << Calendar.YEAR);
+    public final static int MONTH_MASK         = (1 << Calendar.MONTH);
+    public final static int WEEK_OF_YEAR_MASK  = (1 << Calendar.WEEK_OF_YEAR);
+    public final static int DAY_OF_MONTH_MASK  = (1 << Calendar.DAY_OF_MONTH);
+    public final static int DAY_OF_YEAR_MASK   = (1 << Calendar.DAY_OF_YEAR);
+    public final static int DAY_OF_WEEK_MASK   = (1 << Calendar.DAY_OF_WEEK);
+    public final static int HOUR_OF_DAY_MASK   = (1 << Calendar.HOUR_OF_DAY);
+    public final static int MINUTE_MASK        = (1 << Calendar.MINUTE);
+    public final static int SECOND_MASK        = (1 << Calendar.SECOND);
+    public final static int MILLISECOND_MASK   = (1 << Calendar.MILLISECOND);
+    public final static int ZONE_OFFSET_MASK   = (1 << Calendar.ZONE_OFFSET);
+
     private TimeZone timeZone;
 
     public ISO8601Date() {
@@ -359,40 +373,91 @@ public class ISO8601Date extends Date {
      * @return  the date represented by the {@link Calendar} in ISO 8601 format
      */
     public static String toString(Calendar cal, boolean extended) {
-        boolean yearSet = cal.isSet(Calendar.YEAR);
-        boolean monthSet = cal.isSet(Calendar.MONTH);
-        boolean dayOfMonthSet = cal.isSet(Calendar.DAY_OF_MONTH);
-        boolean weekOfYearSet = cal.isSet(Calendar.WEEK_OF_YEAR);
-        boolean dayOfWeekSet = cal.isSet(Calendar.DAY_OF_WEEK);
-        boolean dayOfYearSet = cal.isSet(Calendar.DAY_OF_YEAR);
-        boolean hourOfDaySet = cal.isSet(Calendar.HOUR_OF_DAY);
-        boolean minuteSet = cal.isSet(Calendar.MINUTE);
-        boolean secondSet = cal.isSet(Calendar.SECOND);
-        boolean millisecondSet = cal.isSet(Calendar.MILLISECOND);
-        boolean zoneOffsetSet = cal.isSet(Calendar.ZONE_OFFSET);
+        int fields = 0;
+        if (cal.isSet(Calendar.YEAR))
+            fields |= YEAR_MASK;
+        if (cal.isSet(Calendar.MONTH))
+            fields |= MONTH_MASK;
+        if (cal.isSet(Calendar.DAY_OF_MONTH))
+            fields |= DAY_OF_MONTH_MASK;
+        if (cal.isSet(Calendar.WEEK_OF_YEAR))
+            fields |= WEEK_OF_YEAR_MASK;
+        if (cal.isSet(Calendar.DAY_OF_WEEK))
+            fields |= DAY_OF_WEEK_MASK;
+        if (cal.isSet(Calendar.DAY_OF_YEAR))
+            fields |= DAY_OF_YEAR_MASK;
+        if (cal.isSet(Calendar.HOUR_OF_DAY))
+            fields |= HOUR_OF_DAY_MASK;
+        if (cal.isSet(Calendar.MINUTE))
+            fields |= MINUTE_MASK;
+        if (cal.isSet(Calendar.SECOND))
+            fields |= SECOND_MASK;
+        if (cal.isSet(Calendar.MILLISECOND))
+            fields |= MILLISECOND_MASK;
+        if (cal.isSet(Calendar.ZONE_OFFSET))
+            fields |= ZONE_OFFSET_MASK;
+        return toString(cal, extended, fields);
+    }
+
+    /**
+     * Convert a {@link Calendar} object to an ISO 8601 string.  This function outputs to the
+     * string only those fields selected in a bit mask of field designators.  Not all field
+     * combinations are valid.  The bit mask values are:
+     * 
+     * <dl>
+     *   <dt>YEAR_MASK</dt>
+     *   <dd>Output the year</dd>
+     *   <dt>MONTH_MASK</dt>
+     *   <dd>Output the month</dd>
+     *   <dt>DAY_OF_MONTH_MASK</dt>
+     *   <dd>Output the day of month</dd>
+     *   <dt>WEEK_OF_YEAR_MASK</dt>
+     *   <dd>Output the week of year</dd>
+     *   <dt>DAY_OF_WEEK_MASK</dt>
+     *   <dd>Output the day of week</dd>
+     *   <dt>DAY_OF_YEAR_MASK</dt>
+     *   <dd>Output the day of year</dd>
+     *   <dt>HOUR_OF_DAY_MASK</dt>
+     *   <dd>Output the hour of day</dd>
+     *   <dt>MINUTE_MASK</dt>
+     *   <dd>Output the minutes</dd>
+     *   <dt>SECOND_MASK</dt>
+     *   <dd>Output the seconds</dd>
+     *   <dt>MILLISECOND_MASK</dt>
+     *   <dd>Output the milliseconds</dd>
+     * </dl>
+     *
+     * @param   cal         a {@link Calendar} object
+     * @param   extended    if {@code true}, use "extended" format (include date and time
+     *                      separators)
+     * @param   fields      the selected fields
+     * @return  the date represented by the {@link Calendar} in ISO 8601 format
+     */
+    public static String toString(Calendar cal, boolean extended, int fields) {
         StringBuilder sb = new StringBuilder();
-        if (yearSet) {
+        if (fieldSet(fields, YEAR_MASK)) {
             sb.append(cal.get(Calendar.YEAR));
-            if (monthSet) {
+            if (fieldSet(fields, MONTH_MASK)) {
                 if (extended)
                     sb.append(dateSeparator);
                 append2Digit(sb, cal.get(Calendar.MONTH) + 1);
-                if (dayOfMonthSet) {
+                if (fieldSet(fields, DAY_OF_MONTH_MASK)) {
                     if (extended)
                         sb.append(dateSeparator);
                     append2Digit(sb, cal.get(Calendar.DAY_OF_MONTH));
-                    if (hourOfDaySet || minuteSet || secondSet || millisecondSet) {
+                    if (fieldSet(fields,
+                            HOUR_OF_DAY_MASK | MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK)) {
                         sb.append(dateTimeSeparator);
-                        appendTime(sb, cal, extended, minuteSet, secondSet, millisecondSet);
+                        appendTime(sb, cal, extended, fields);
                     }
                 }
             }
-            else if (weekOfYearSet) {
+            else if (fieldSet(fields, WEEK_OF_YEAR_MASK)) {
                 if (extended)
                     sb.append(dateSeparator);
                 sb.append(weekNumberSeparator);
                 append2Digit(sb, cal.get(Calendar.WEEK_OF_YEAR));
-                if (dayOfWeekSet) {
+                if (fieldSet(fields, DAY_OF_WEEK_MASK)) {
                     int d = cal.get(Calendar.DAY_OF_WEEK);
                     for (int i = 1; i < 8; i++) {
                         if (parseDays[i] == d) {
@@ -402,25 +467,27 @@ public class ISO8601Date extends Date {
                             break;
                         }
                     }
-                    if (hourOfDaySet || minuteSet || secondSet || millisecondSet) {
+                    if (fieldSet(fields,
+                            HOUR_OF_DAY_MASK | MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK)) {
                         sb.append(dateTimeSeparator);
-                        appendTime(sb, cal, extended, minuteSet, secondSet, millisecondSet);
+                        appendTime(sb, cal, extended, fields);
                     }
                 }
             }
-            else if (dayOfYearSet) {
+            else if (fieldSet(fields, DAY_OF_YEAR_MASK)) {
                 if (extended)
                     sb.append(dateSeparator);
                 append3Digit(sb, cal.get(Calendar.DAY_OF_YEAR));
-                if (hourOfDaySet || minuteSet || secondSet || millisecondSet) {
+                if (fieldSet(fields,
+                        HOUR_OF_DAY_MASK | MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK)) {
                     sb.append(dateTimeSeparator);
-                    appendTime(sb, cal, extended, minuteSet, secondSet, millisecondSet);
+                    appendTime(sb, cal, extended, fields);
                 }
             }
         }
         else
-            appendTime(sb, cal, extended, minuteSet, secondSet, millisecondSet);
-        if (zoneOffsetSet) {
+            appendTime(sb, cal, extended, fields);
+        if (fieldSet(fields, ZONE_OFFSET_MASK)) {
             int mins = cal.get(Calendar.ZONE_OFFSET) / 60_000;
             if (mins == 0)
                 sb.append(zeroTimeZoneIndicator);
@@ -437,18 +504,22 @@ public class ISO8601Date extends Date {
         return sb.toString();
     }
 
+    private static boolean fieldSet(int fields, int mask) {
+        return (fields & mask) != 0;
+    }
+
     private static void appendTime(StringBuilder sb, Calendar cal, boolean extended,
-            boolean minuteSet, boolean secondSet, boolean millisecondSet) {
+            int fields) {
         append2Digit(sb, cal.get(Calendar.HOUR_OF_DAY));
-        if (minuteSet || secondSet || millisecondSet) {
+        if ((fields & (MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK)) != 0) {
             if (extended)
                 sb.append(timeSeparator);
             append2Digit(sb, cal.get(Calendar.MINUTE));
-            if (secondSet || millisecondSet) {
+            if ((fields & (SECOND_MASK | MILLISECOND_MASK)) != 0) {
                 if (extended)
                     sb.append(timeSeparator);
                 append2Digit(sb, cal.get(Calendar.SECOND));
-                if (millisecondSet) {
+                if ((fields & MILLISECOND_MASK) != 0) {
                     sb.append(defaultDecimalSeparator);
                     append3Digit(sb, cal.get(Calendar.MILLISECOND));
                 }
