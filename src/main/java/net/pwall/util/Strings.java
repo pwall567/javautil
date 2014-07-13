@@ -28,6 +28,7 @@ package net.pwall.util;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * String utility functions.
@@ -246,14 +247,13 @@ public class Strings {
      * @see     Strings#split(String, SpaceTest)
      * @see     Strings#split(String, int, int, SpaceTest)
      */
-    //@FunctionalInterface /* TODO uncomment this when Java 8 is available */
     public static interface SpaceTest {
-        boolean isSpace(char ch);
+        boolean isSpace(int ch);
     }
 
     public static final SpaceTest defaultSpaceTest = new SpaceTest() {
         @Override
-        public boolean isSpace(char ch) {
+        public boolean isSpace(int ch) {
             return Character.isWhitespace(ch);
         }
     };
@@ -1474,6 +1474,128 @@ public class Strings {
                 return false;
         }
         return true;
+    }
+
+    /**
+     * Trim leading and trailing characters from a string, where those characters match a
+     * supplied {@link SpaceTest} interface implementation.
+     *
+     * @param   s           the string to be trimmed
+     * @param   spaceTest   the {@link SpaceTest}
+     * @return  the trimmed string
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static String trim(String s, SpaceTest spaceTest) {
+        Objects.requireNonNull(spaceTest);
+        int start = 0;
+        int end = s.length();
+        for (;;) {
+            if (start >= end)
+                return emptyString;
+            if (!spaceTest.isSpace(s.charAt(start)))
+                break;
+            start++;
+        }
+        while (spaceTest.isSpace(s.charAt(end - 1)))
+            end--;
+        return start == 0 && end == s.length() ? s : s.substring(start, end);
+    }
+
+    /**
+     * Trim leading and trailing characters from a {@link CharSequence}, where those characters
+     * match a supplied {@link SpaceTest} functional interface implementation.
+     *
+     * @param   cs          the {@link CharSequence} to be trimmed
+     * @param   spaceTest   the {@link SpaceTest}
+     * @return  the trimmed {@link CharSequence}
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static CharSequence trim(CharSequence cs, SpaceTest spaceTest) {
+        Objects.requireNonNull(spaceTest);
+        int start = 0;
+        int end = cs.length();
+        for (;;) {
+            if (start >= end)
+                return emptyString;
+            if (!spaceTest.isSpace(cs.charAt(start)))
+                break;
+            start++;
+        }
+        while (spaceTest.isSpace(cs.charAt(end - 1)))
+            end--;
+        return start == 0 && end == cs.length() ? cs : new SubSequence(cs, start, end);
+    }
+
+    /**
+     * Trim leading and trailing whitespace from a string, where white space is determined by
+     * {@link Character#isWhitespace(char)}.
+     *
+     * @param   s       the string to be trimmed
+     * @return  the trimmed string
+     * @throws  NullPointerException if the input string is {@code null}
+     */
+    public static String trim(String s) {
+        return trim(s, defaultSpaceTest);
+    }
+
+    /**
+     * Trim leading and trailing whitespace from a {@link CharSequence}, where white space is
+     * determined by {@link Character#isWhitespace(char)}.
+     *
+     * @param   cs      the {@link CharSequence} to be trimmed
+     * @return  the trimmed {@link CharSequence}
+     * @throws  NullPointerException if the input {@link CharSequence} is {@code null}
+     */
+    public static CharSequence trim(CharSequence cs) {
+        return trim(cs, defaultSpaceTest);
+    }
+
+    /**
+     * Trim leading and trailing code points from a UTF16 string, where those code points match
+     * a supplied {@link SpaceTest} interface implementation.
+     *
+     * @param s the string to be trimmed
+     * @param spaceTest the {@link SpaceTest}
+     * @return the trimmed string
+     * @throws NullPointerException if either argument is {@code null}
+     */
+    public static String trimUTF16(String s, SpaceTest spaceTest) {
+        Objects.requireNonNull(spaceTest);
+        int start = 0;
+        int end = s.length();
+        for (;;) {
+            if (start >= end)
+                return emptyString;
+            char hi = s.charAt(start);
+            if (Character.isHighSurrogate(hi) && start + 1 < end) {
+                char lo = s.charAt(start + 1);
+                if (Character.isLowSurrogate(lo)) {
+                    if (!spaceTest.isSpace(Character.toCodePoint(hi, lo)))
+                        break;
+                    start += 2;
+                    continue;
+                }
+            }
+            if (!spaceTest.isSpace(hi))
+                break;
+            start++;
+        }
+        while (end > start) {
+            char lo = s.charAt(end - 1);
+            if (Character.isLowSurrogate(lo) && end - 1 > start) {
+                char hi = s.charAt(end - 2);
+                if (Character.isHighSurrogate(hi)) {
+                    if (!spaceTest.isSpace(Character.toCodePoint(hi, lo)))
+                        break;
+                    end -= 2;
+                    continue;
+                }
+            }
+            if (!spaceTest.isSpace(lo))
+                break;
+            end--;
+        }
+        return start == 0 && end == s.length() ? s : s.substring(start, end);
     }
 
 }
