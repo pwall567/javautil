@@ -611,8 +611,7 @@ public class Strings {
      */
     public static final String escape(String s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
-            char ch = s.charAt(i++);
-            String mapped = mapper.map(ch);
+            String mapped = mapper.map(s.charAt(i++));
             if (mapped != null) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(s, 0, i - 1);
@@ -640,8 +639,7 @@ public class Strings {
      */
     public static final CharSequence escape(CharSequence s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
-            char ch = s.charAt(i++);
-            String mapped = mapper.map(ch);
+            String mapped = mapper.map(s.charAt(i++));
             if (mapped != null) {
                 StringBuilder sb = new StringBuilder();
                 sb.append(s, 0, i - 1);
