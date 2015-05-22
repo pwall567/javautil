@@ -81,7 +81,7 @@ public class UserError extends RuntimeException {
      * overrides the default behaviour to output only the error line and <strong>not</strong>
      * the stack trace.
      *
-     * @param   ps      the {@link PrintWriter}
+     * @param   pw      the {@link PrintWriter}
      */
     @Override
     public void printStackTrace(PrintWriter pw) {

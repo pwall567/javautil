@@ -563,13 +563,13 @@ public class Strings {
      * @return  the concatenation of the string representations of the members (an empty string
      *          if the {@link Enumeration} has no members)
      */
-    public static <E> String join(Enumeration<E> it, String separator) {
-        if (!it.hasMoreElements())
+    public static <E> String join(Enumeration<E> e, String separator) {
+        if (!e.hasMoreElements())
             return emptyString;
         StringBuilder sb = new StringBuilder();
         for (;;) {
-            sb.append(it.nextElement());
-            if (!it.hasMoreElements())
+            sb.append(e.nextElement());
+            if (!e.hasMoreElements())
                 break;
             sb.append(separator);
         }
@@ -1177,7 +1177,7 @@ public class Strings {
      * Append a byte value as hexadecimal to an {@link Appendable}.
      *
      * @param   a       the {@link Appendable}
-     * @param   n       the byte
+     * @param   b       the byte
      * @throws IOException if thrown by the {@link Appendable}
      */
     public static void appendHex(Appendable a, byte b) throws IOException {
@@ -1189,7 +1189,7 @@ public class Strings {
      * Append a character value as hexadecimal to an {@link Appendable}.
      *
      * @param   a       the {@link Appendable}
-     * @param   n       the character
+     * @param   ch      the character
      * @throws IOException if thrown by the {@link Appendable}
      */
     public static void appendHex(Appendable a, char ch) throws IOException {
@@ -1201,7 +1201,7 @@ public class Strings {
      * Append an integer value as hexadecimal to an {@link Appendable}.
      *
      * @param   a       the {@link Appendable}
-     * @param   n       the number
+     * @param   i       the number
      * @throws IOException if thrown by the {@link Appendable}
      */
     public static void appendHex(Appendable a, int i) throws IOException {
@@ -1361,7 +1361,7 @@ public class Strings {
      * @param   target  the target {@link CharSequence} ({@link String}, {@link StringBuilder},
      *                  {@link StringBuffer} etc.)
      * @return          {@code true} if the target string matches the pattern
-     * @see             
+     * @see             #wildcardCompare(String, int, int, CharSequence)
      */
     public static boolean multiWildcardCompare(String pattern, CharSequence target) {
         int patIndex = 0;
