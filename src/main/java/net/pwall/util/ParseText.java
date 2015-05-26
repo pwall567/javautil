@@ -1031,22 +1031,33 @@ public class ParseText {
     public String unescape(CharUnmapper charUnmapper, char stopper) {
         int i = index;
         start = i;
-        StringBuilder sb = new StringBuilder();
-        for (;;) {
-            if (i >= text.length())
-                break;
+        int len = text.length();
+        while (i < len) {
             char ch = text.charAt(i);
             if (ch == stopper)
                 break;
-            if (charUnmapper.isEscape(text, i))
+            if (charUnmapper.isEscape(text, i)) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(text, start, i);
                 i += charUnmapper.unmap(sb, text, i);
-            else {
-                sb.append(ch);
-                i++;
+                while (i < len) {
+                    ch = text.charAt(i);
+                    if (ch == stopper)
+                        break;
+                    if (charUnmapper.isEscape(text, i))
+                        i += charUnmapper.unmap(sb, text, i);
+                    else {
+                        sb.append(ch);
+                        i++;
+                    }
+                }
+                index = i;
+                return sb.toString();
             }
+            i++;
         }
         index = i;
-        return sb.toString();
+        return text.subSequence(start, i).toString();
     }
 
     /**
