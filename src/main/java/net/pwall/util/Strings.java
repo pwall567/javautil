@@ -956,6 +956,8 @@ public class Strings {
      * @param   start   the start index
      * @param   end     the end index
      * @return          the UTF-8 form of the string (as a byte array)
+     * @throws          IllegalArgumentException if the string is {@code null}, or if the string
+     *                  contains an invalid UTF-16 sequence
      */
     public static byte[] toUTF8(String str, int start, int end) {
         // note - expects the string to be encoded in UTF-16
@@ -992,6 +994,91 @@ public class Strings {
             }
         }
         return bab.toByteArray();
+    }
+
+    /**
+     * Convert a byte array from UTF-8 encoding to a UTF-16 string.
+     *
+     * @param   bytes   the byte array
+     * @return          the decoded string
+     * @throws          IllegalArgumentException if the byte array is {@code null}, or if the
+     *                  byte array contains an invalid UTF-8 sequence
+     */
+    public static String fromUTF8(byte[] bytes) {
+        if (bytes == null)
+            throw new IllegalArgumentException("Byte array must not be null");
+        return fromUTF8(bytes, 0, bytes.length);
+    }
+
+    /**
+     * Convert a portion of a byte array from UTF-8 encoding to a UTF-16 string.
+     *
+     * @param   bytes   the byte array
+     * @param   start   the start index
+     * @param   end     the end index
+     * @return          the decoded string
+     * @throws          IllegalArgumentException if the byte array is {@code null}, if the start
+     *                  or end index is invalid, or if the byte array contains an invalid UTF-8
+     *                  sequence
+     */
+    public static String fromUTF8(byte[] bytes, int start, int end) {
+        if (bytes == null)
+            throw new IllegalArgumentException("Byte array must not be null");
+        if (start < 0 || start > bytes.length)
+            throw new IllegalArgumentException("Start index invalid: " + start);
+        if (end < start || end > bytes.length)
+            throw new IllegalArgumentException("End index invalid: " + end);
+        StringBuilder sb = new StringBuilder();
+        for (int i = start; i < end; i++) {
+            int b = bytes[i];
+            if ((b & 0x80) == 0)
+                sb.append((char)b);
+            else if ((b & 0x40) == 0)
+                throw new IllegalArgumentException("Illegal character in UTF-8 bytes");
+            else if ((b & 0x20) == 0) {
+                int codePoint = b & 0x1F;
+                codePoint = addToCodePoint(codePoint, bytes, ++i, end);
+                sb.append((char)codePoint);
+            }
+            else if ((b & 0x10) == 0) {
+                int codePoint = b & 0x0F;
+                codePoint = addToCodePoint(codePoint, bytes, ++i, end);
+                codePoint = addToCodePoint(codePoint, bytes, ++i, end);
+                sb.append((char)codePoint);
+            }
+            else {
+                int codePoint = b & 0x07;
+                codePoint = addToCodePoint(codePoint, bytes, ++i, end);
+                codePoint = addToCodePoint(codePoint, bytes, ++i, end);
+                codePoint = addToCodePoint(codePoint, bytes, ++i, end);
+                try {
+                    appendUTF16(sb, codePoint);
+                }
+                catch (IOException ioe) {
+                    // can't happen - StringBuilder.append() does not throw IOException
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Accumulate codepoint (UTF-8 decoding).
+     *
+     * @param   codePoint   the codepoint so far
+     * @param   bytes       the byte array
+     * @param   index       the current index into the array
+     * @param   end         the end index
+     * @return              the updated codepoint
+     * @throws  IllegalArgumentException if the bytes are invalid
+     */
+    private static int addToCodePoint(int codePoint, byte[] bytes, int index, int end) {
+        if (index >= end)
+            throw new IllegalArgumentException("Incomplete sequence in UTF-8 bytes");
+        int b = bytes[index];
+        if ((b & 0xC0) != 0x80)
+            throw new IllegalArgumentException("Illegal character in UTF-8 bytes");
+        return (codePoint << 6) | (b & 0x3F);
     }
 
     /**
