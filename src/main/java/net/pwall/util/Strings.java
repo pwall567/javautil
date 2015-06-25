@@ -950,6 +950,20 @@ public class Strings {
     }
 
     /**
+     * Convert a byte array from UTF-8 encoding to a UTF-16 string.
+     *
+     * @param   bytes   the byte array
+     * @return          the decoded string
+     * @throws          IllegalArgumentException if the byte array is {@code null}, or if the
+     *                  byte array contains an invalid UTF-8 sequence
+     */
+    public static String fromUTF8(byte[] bytes) {
+        if (bytes == null)
+            throw new IllegalArgumentException("Byte array must not be null");
+        return fromUTF8(bytes, 0, bytes.length);
+    }
+
+    /**
      * Convert a portion of a string to UTF-8 encoding.
      *
      * @param   str     the string
@@ -975,39 +989,29 @@ public class Strings {
             }
             else
                 codePoint = ch;
-            if (codePoint <= 0x7F)
-                bab.append(codePoint);
-            else if (codePoint <= 0x7FF) {
-                bab.append((codePoint >> 6) | 0xC0);
-                bab.append((codePoint & 0x3F) | 0x80);
-            }
-            else if (codePoint <= 0xFFFF) {
-                bab.append((codePoint >> 12) | 0xE0);
-                bab.append(((codePoint >> 6) & 0x3F) | 0x80);
-                bab.append((codePoint & 0x3F) | 0x80);
-            }
-            else {
-                bab.append(((codePoint >> 18) & 0x7) | 0xF0);
-                bab.append(((codePoint >> 12) & 0x3F) | 0x80);
-                bab.append(((codePoint >> 6) & 0x3F) | 0x80);
-                bab.append((codePoint & 0x3F) | 0x80);
-            }
+            appendUTF8(bab, codePoint);
         }
         return bab.toByteArray();
     }
 
-    /**
-     * Convert a byte array from UTF-8 encoding to a UTF-16 string.
-     *
-     * @param   bytes   the byte array
-     * @return          the decoded string
-     * @throws          IllegalArgumentException if the byte array is {@code null}, or if the
-     *                  byte array contains an invalid UTF-8 sequence
-     */
-    public static String fromUTF8(byte[] bytes) {
-        if (bytes == null)
-            throw new IllegalArgumentException("Byte array must not be null");
-        return fromUTF8(bytes, 0, bytes.length);
+    public static void appendUTF8(ByteArrayBuilder bab, int codePoint) {
+        if (codePoint <= 0x7F)
+            bab.append(codePoint);
+        else if (codePoint <= 0x7FF) {
+            bab.append((codePoint >> 6) | 0xC0);
+            bab.append((codePoint & 0x3F) | 0x80);
+        }
+        else if (codePoint <= 0xFFFF) {
+            bab.append((codePoint >> 12) | 0xE0);
+            bab.append(((codePoint >> 6) & 0x3F) | 0x80);
+            bab.append((codePoint & 0x3F) | 0x80);
+        }
+        else {
+            bab.append(((codePoint >> 18) & 0x7) | 0xF0);
+            bab.append(((codePoint >> 12) & 0x3F) | 0x80);
+            bab.append(((codePoint >> 6) & 0x3F) | 0x80);
+            bab.append((codePoint & 0x3F) | 0x80);
+        }
     }
 
     /**
@@ -1681,6 +1685,31 @@ public class Strings {
             end--;
         }
         return start == 0 && end == s.length() ? s : s.substring(start, end);
+    }
+
+    /**
+     * Convenience method to create a {@link StringBuilder}.  Supports the idiom:
+     * <pre>
+     *     String str = Strings.build().append('(').append(n).append(')').toString();
+     * </pre>
+     *
+     * @return  the new {@link StringBuilder}
+     */
+    public static StringBuilder build() {
+        return new StringBuilder();
+    }
+
+    /**
+     * Convenience method to create a {@link StringBuilder}.  Supports the idiom:
+     * <pre>
+     *     String str = Strings.build("(").append(n).append(')').toString();
+     * </pre>
+     *
+     * @param   cs      the initial contents
+     * @return  the new {@link StringBuilder}
+     */
+    public static StringBuilder build(CharSequence cs) {
+        return new StringBuilder(cs);
     }
 
 }
