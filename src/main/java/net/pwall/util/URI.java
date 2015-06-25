@@ -34,25 +34,31 @@ public class URI {
 
     private static final CharMapper charMapper = new AbstractCharMapper() {
         @Override
-        public String map(int codePoint) {
-            if (codePoint > 0xFF)
-                throw new IllegalArgumentException("Character outside range");
-            if (!isUnreserved((char)codePoint))
-                return hexMapping(codePoint, 2, "%", null);
+        public String map(int cp) {
+            if (cp > 0x7F) {
+                StringBuilder sb = new StringBuilder();
+                ByteArrayBuilder bab = new ByteArrayBuilder();
+                Strings.appendUTF8(bab, cp);
+                for (int i = 0; i < bab.length(); i++)
+                    sb.append(hexMapping(bab.get(i), 2, "%", null));
+                return sb.toString();
+            }
+            if (!isUnreserved(cp))
+                return hexMapping(cp, 2, "%", null);
             return null;
         }
     };
 
     /**
-     * Test whether a given character is "unreserved" according to the URI specification
+     * Test whether a given code point is "unreserved" according to the URI specification
      * <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a>.
      *
-     * @param ch    the character to be tested
+     * @param cp    the code point to be tested
      * @return      {@code true} if the character is unreserved
      */
-    public static boolean isUnreserved(char ch) {
-        return ch >= 'A' && ch <= 'Z' || ch >= 'a' && ch <= 'z' || ch >= '0' && ch <= '9' ||
-                ch == '-' || ch == '.' || ch == '_' || ch == '~';
+    public static boolean isUnreserved(int cp) {
+        return cp >= 'A' && cp <= 'Z' || cp >= 'a' && cp <= 'z' || cp >= '0' && cp <= '9' ||
+                cp == '-' || cp == '.' || cp == '_' || cp == '~';
     }
 
     /**
