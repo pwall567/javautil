@@ -98,6 +98,12 @@ public class ByteArrayBuilder {
         buf[index] = (byte)value;
     }
 
+    public byte get(int index) {
+        if (index < 0 || index >= count)
+            throw new IndexOutOfBoundsException("index=" + index + "; count=" + count);
+        return buf[index];
+    }
+
     private void ensureCapacity(int newCapacity) {
         int oldCapacity = buf.length;
         if (newCapacity > oldCapacity) {
