@@ -40,4 +40,32 @@ public class TestStrings {
         }
     }
 
+    @Test
+    public void test_split_S_S() {
+        String s1 = "the quick brown fox jumps over the lazy dog";
+        String s2 = "the";
+        String[] result = Strings.split(s1, s2);
+        assertEquals(3, result.length);
+        assertEquals("", result[0]);
+        assertEquals(" quick brown fox jumps over ", result[1]);
+        assertEquals(" lazy dog", result[2]);
+        s2 = "dog";
+        result = Strings.split(s1, s2);
+        assertEquals(2, result.length);
+        assertEquals("the quick brown fox jumps over the lazy ", result[0]);
+        assertEquals("", result[1]);
+        s2 = " ";
+        result = Strings.split(s1, s2);
+        assertEquals(9, result.length);
+        assertEquals("the", result[0]);
+        assertEquals("quick", result[1]);
+        assertEquals("brown", result[2]);
+        assertEquals("fox", result[3]);
+        assertEquals("jumps", result[4]);
+        assertEquals("over", result[5]);
+        assertEquals("the", result[6]);
+        assertEquals("lazy", result[7]);
+        assertEquals("dog", result[8]);
+    }
+
 }

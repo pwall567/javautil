@@ -239,11 +239,45 @@ public class Strings {
     }
 
     /**
+     * Split a string on a given string separator.
+     *
+     * @param   s1      the string to be split
+     * @param   s2      the separator
+     * @return          an array of items (possibly empty)
+     * @throws          NullPointerException if either string is {@code null}
+     */
+    public static String[] split(String s1, String s2) {
+        int count = 0;
+        int i = 0;
+        int n2 = s2.length();
+        int stopper = s1.length() - n2;
+        while (i <= stopper) {
+            if (s1.regionMatches(i, s2, 0, n2)) {
+                count++;
+                i += n2;
+            }
+            else
+                i++;
+        }
+        String[] result = new String[count + 1];
+        i = 0;
+        for (int j = 0; j < count; j++) {
+            int k = i;
+            while (!s1.regionMatches(i, s2, 0, n2))
+                i++;
+            result[j] = s1.substring(k, i);
+            i += n2;
+        }
+        result[count] = s1.substring(i);
+        return result;
+    }
+
+    /**
      * An interface to define a space test for the associated {@code split()} functions.  The
      * interface is named {@code SpaceTest} rather than {@code SeparatorTest} because the
-     * functions that use it treat multiple occurences as equivalent to a single character -
+     * functions that use it treat multiple occurrences as equivalent to a single character -
      * this is generally the required behaviour for spaces but not for, say, commas.
-     * 
+     *
      * @see     Strings#split(String, SpaceTest)
      * @see     Strings#split(String, int, int, SpaceTest)
      */
