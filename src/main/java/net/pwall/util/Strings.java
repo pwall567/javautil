@@ -247,6 +247,7 @@ public class Strings {
      * @throws          NullPointerException if either string is {@code null}
      */
     public static String[] split(String s1, String s2) {
+        // first pass through the string to count the number of separators
         int count = 0;
         int i = 0;
         int n2 = s2.length();
@@ -259,15 +260,21 @@ public class Strings {
             else
                 i++;
         }
+        // result array size is number of separators plus 1
         String[] result = new String[count + 1];
+        // for each result entry prior to the last...
         i = 0;
         for (int j = 0; j < count; j++) {
+            // store start index and skip to separator
             int k = i;
             while (!s1.regionMatches(i, s2, 0, n2))
                 i++;
+            // add result substring to array
             result[j] = s1.substring(k, i);
+            // and skip past separator
             i += n2;
         }
+        // the last entry consists of the remainder of the string
         result[count] = s1.substring(i);
         return result;
     }
