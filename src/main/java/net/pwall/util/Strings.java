@@ -2,7 +2,7 @@
  * @(#) Strings.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014 Peter Wall
+ * Copyright (c) 2013, 2014, 2015 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -1751,6 +1751,23 @@ public class Strings {
      */
     public static StringBuilder build(CharSequence cs) {
         return new StringBuilder(cs);
+    }
+
+    /**
+     * Convert an integer to a spreadsheet-style column identifier ("A", "B", ... "Z", "AA"
+     * etc.).
+     *
+     * @param   i       the number to convert
+     * @return  the identifier
+     */
+    public static String toIdentifier(int i) {
+        StringBuilder sb = new StringBuilder();
+        i = Math.abs(i);
+        do {
+            sb.insert(0, (char)(i % 26 + 'A'));
+            i = i / 26 - 1;
+        } while (i >= 0);
+        return sb.toString();
     }
 
 }

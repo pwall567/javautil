@@ -66,6 +66,19 @@ public class TestStrings {
         assertEquals("the", result[6]);
         assertEquals("lazy", result[7]);
         assertEquals("dog", result[8]);
+        s2 = "*";
+        result = Strings.split(s1, s2);
+        assertEquals(1, result.length);
+        assertEquals(s1, result[0]);
+    }
+
+    @Test
+    public void test_toIdentifier() {
+        assertEquals("A", Strings.toIdentifier(0));
+        assertEquals("B", Strings.toIdentifier(1));
+        assertEquals("Z", Strings.toIdentifier(25));
+        assertEquals("AA", Strings.toIdentifier(26));
+        assertEquals("AB", Strings.toIdentifier(27));
     }
 
 }
