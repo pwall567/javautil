@@ -50,8 +50,10 @@ public class OrderedSet<E> extends AbstractSet<E> {
      * Test whether the set contains the specified object.
      *
      * @param   o   the object
+     * @return  {@code true} if the object is contained in the set
      * @throws  NullPointerException    if the object is {@code null}
      * @throws  ClassCastException      if the object is not of the class of the set
+     * @see     Collection#contains(Object)
      */
     @Override
     public boolean contains(Object o) {
@@ -76,7 +78,9 @@ public class OrderedSet<E> extends AbstractSet<E> {
      * Add an element to the set.
      *
      * @param   e   the new element
-     * @throws  NullPointerException    if the object is {@code null}
+     * @return  {@code true} if the set changed as a result of the operation
+     * @throws  NullPointerException if the object is {@code null}
+     * @see     Collection#add(Object)
      */
     @Override
     public boolean add(E e) {
@@ -103,6 +107,7 @@ public class OrderedSet<E> extends AbstractSet<E> {
      * @param   o   the object to be removed
      * @throws  NullPointerException    if the object is {@code null}
      * @throws  ClassCastException      if the object is not of the class of the set
+     * @see     Collection#remove(Object)
      */
     @Override
     public boolean remove(Object o) {
@@ -127,6 +132,7 @@ public class OrderedSet<E> extends AbstractSet<E> {
 
     /**
      * {@inheritDoc}
+     * @see Collection#clear()
      */
     @Override
     public void clear() {
@@ -138,6 +144,7 @@ public class OrderedSet<E> extends AbstractSet<E> {
      * returned in the order determined by the {@link Comparator} associated with the set.
      *
      * @return  the {@link Iterator}
+     * @see     Collection#iterator()
      */
     @Override
     public Iterator<E> iterator() {
@@ -146,6 +153,7 @@ public class OrderedSet<E> extends AbstractSet<E> {
 
     /**
      * {@inheritDoc}
+     * @see Collection#size()
      */
     @Override
     public int size() {
