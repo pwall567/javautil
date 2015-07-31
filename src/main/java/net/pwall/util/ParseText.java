@@ -169,21 +169,21 @@ public class ParseText {
     }
 
     /**
-     * Get the current character (the character at the index).
+     * Get the character at the current index and incement the index.
      *
      * @return  the current character
      * @throws  StringIndexOutOfBoundsException if the index is at or beyond end of string
-     * @deprecated      use {@link #getCodePoint()} instead
      */
-    @Deprecated
     public char getChar() {
+        start = index;
         if (index >= text.length())
             throw new StringIndexOutOfBoundsException("ParseText exhausted");
-        return text.charAt(index);
+        return text.charAt(index++);
     }
 
     /**
-     * Get the Unicode code point at the current character index.
+     * Get the Unicode code point at the current character index and increment the index past
+     * the code point.
      *
      * @return  the code point
      * @throws  StringIndexOutOfBoundsException if the index is at or beyond end of string
@@ -250,8 +250,21 @@ public class ParseText {
      *          {@code int}
      */
     public int getResultInt() {
+        return getInt(start, index);
+    }
+
+    /**
+     * Get an {@code int} from the text.
+     *
+     * @param   from    the start offset
+     * @param   to      the end offset
+     * @return  the {@code int}
+     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for an
+     *          {@code int}
+     */
+    public int getInt(int from, int to) {
         int result = 0;
-        for (int i = start; i < index; i++) {
+        for (int i = from; i < to; i++) {
             int n = convertDecDigit(text.charAt(i));
             if (result > MAX_INT_DIV_10 || result == MAX_INT_DIV_10 && n > MAX_INT_MOD_10)
                 throw new NumberFormatException();
@@ -271,8 +284,21 @@ public class ParseText {
      *          {@code long}
      */
     public long getResultLong() {
+        return getLong(start, index);
+    }
+
+    /**
+     * Get a {@code long} from the text.
+     *
+     * @param   from    the start offset
+     * @param   to      the end offset
+     * @return  the {@code long}
+     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for a
+     *          {@code long}
+     */
+    public long getLong(int from, int to) {
         long result = 0;
-        for (int i = start; i < index; i++) {
+        for (int i = from; i < to; i++) {
             int n = convertDecDigit(text.charAt(i));
             if (result > MAX_LONG_DIV_10 || result == MAX_LONG_DIV_10 && n > MAX_LONG_MOD_10)
                 throw new NumberFormatException();
@@ -305,8 +331,21 @@ public class ParseText {
      *          {@code int}
      */
     public int getResultHexInt() {
+        return getHexInt(start, index);
+    }
+
+    /**
+     * Get an {@code int} from the text, treating the digits as hexadecimal.
+     *
+     * @param   from    the start offset
+     * @param   to      the end offset
+     * @return  the hexadecimal {@code int}
+     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for an
+     *          {@code int}
+     */
+    public int getHexInt(int from, int to) {
         int result = 0;
-        for (int i = start; i < index; i++) {
+        for (int i = from; i < to; i++) {
             if ((result & 0xF8000000) != 0)
                 throw new NumberFormatException();
             result = result << 4 | convertHexDigit(text.charAt(i));
@@ -323,8 +362,21 @@ public class ParseText {
      *          {@code long}
      */
     public long getResultHexLong() {
+        return getHexLong(start, index);
+    }
+
+    /**
+     * Get a {@code long} from the text, treating the digits as hexadecimal.
+     *
+     * @param   from    the start offset
+     * @param   to      the end offset
+     * @return  the hexadecimal {@code long]
+     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for an
+     *          {@code int}
+     */
+    public long getHexLong(int from, int to) {
         long result = 0;
-        for (int i = start; i < index; i++) {
+        for (int i = from; i < to; i++) {
             if ((result & 0xF800000000000000L) != 0)
                 throw new NumberFormatException();
             result = result << 4 | convertHexDigit(text.charAt(i));
