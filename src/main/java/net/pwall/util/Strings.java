@@ -50,15 +50,24 @@ public class Strings {
     private static final String[] emptyStringArray = {};
 
     /**
+     * Private constructor to prevent instantiation.  Attempts to instantiate the class via
+     * reflection will cause an {@link IllegalAccessException}.
+     *
+     * @throws  IllegalAccessException in all cases
+     */
+    private Strings() throws IllegalAccessException {
+        throw new IllegalAccessException("Attempt to instantiate Strings class");
+    }
+
+    /**
      * Convert a number to words in English.
      *
      * @param   n       the number
      * @return          a string containing the number in words
      */
     public static String toEnglish(int n) {
-        n = Math.abs(n);
-        if (n < 20)
-            return numberNamesEnglish[n]; // avoids allocating StringBuilder and handles zero
+        if (n >= 0 && n < 20)
+            return numberNamesEnglish[n]; // avoids allocating StringBuilder
         StringBuilder sb = new StringBuilder();
         try {
             appendEnglish(sb, n);
@@ -69,30 +78,41 @@ public class Strings {
         return sb.toString();
     }
 
-    public static void appendEnglish(Appendable a, int n) throws IOException {
-        n = Math.abs(n);
-        if (n < 20) {
-            a.append(numberNamesEnglish[n]);
-            return;
+    /**
+     * Append a number converted to words in English to an {@link Appendable}.
+     *
+     * @param   a   the {@link Appendable}
+     * @param   n   the number
+     * @return  the {@link Appendable} (for chaining)
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static Appendable appendEnglish(Appendable a, int n) throws IOException {
+        if (n >= 0 && n < 20) // optimisation also handles zero
+            return a.append(numberNamesEnglish[n]);
+        if (n < 0) {
+            a.append("minus ");
+            if (n == Integer.MIN_VALUE) { // can't simply negate MIN_VALUE
+                a.append("two billion, ");
+                n = (int)(0x80000000L % 1_000_000_000);
+            }
+            else
+                n = -n;
         }
     concat: {
-            if (n >= 1_000_000_000) { // 32-bit int can't be greater than five billion
-                appendEnglish(a, n / 1_000_000_000);
-                a.append(" billion");
+            if (n >= 1_000_000_000) { // signed 32-bit int can't be greater than three billion
+                appendEnglish(a, n / 1_000_000_000).append(" billion");
                 if ((n %= 1_000_000_000) == 0)
                     break concat;
                 a.append(n >= 100 ? ", " : " and ");
             }
             if (n >= 1_000_000) {
-                appendEnglish(a, n / 1_000_000);
-                a.append(" million");
+                appendEnglish(a, n / 1_000_000).append(" million");
                 if ((n %= 1_000_000) == 0)
                     break concat;
                 a.append(n >= 100 ? ", " : " and ");
             }
             if (n >= 1_000) {
-                appendEnglish(a, n / 1_000);
-                a.append(" thousand");
+                appendEnglish(a, n / 1_000).append(" thousand");
                 if ((n %= 1_000) == 0)
                     break concat;
                 a.append(n >= 100 ? ", " : " and ");
@@ -111,6 +131,7 @@ public class Strings {
             if (n > 0)
                 a.append(numberNamesEnglish[n]);
         }
+        return a;
     }
 
     /**

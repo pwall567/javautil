@@ -81,4 +81,21 @@ public class TestStrings {
         assertEquals("AB", Strings.toIdentifier(27));
     }
 
+    @Test
+    public void test_toEnglish() {
+        assertEquals("zero", Strings.toEnglish(0));
+        assertEquals("one", Strings.toEnglish(1));
+        assertEquals("two", Strings.toEnglish(2));
+        assertEquals("twelve", Strings.toEnglish(12));
+        assertEquals("twenty", Strings.toEnglish(20));
+        assertEquals("twenty-two", Strings.toEnglish(22));
+        assertEquals("minus one", Strings.toEnglish(-1));
+        assertEquals("two billion, one hundred and forty-seven million, " +
+                "four hundred and eighty-three thousand, six hundred and forty-seven",
+                Strings.toEnglish(0x7FFFFFFF));
+        assertEquals("minus two billion, one hundred and forty-seven million, " +
+                "four hundred and eighty-three thousand, six hundred and forty-eight",
+                Strings.toEnglish(0x80000000));
+    }
+
 }
