@@ -169,7 +169,7 @@ public class ParseText {
     }
 
     /**
-     * Get the character at the current index and incement the index.
+     * Get the character at the current index and increment the index.
      *
      * @return  the current character
      * @throws  StringIndexOutOfBoundsException if the index is at or beyond end of string
