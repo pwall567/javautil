@@ -25,6 +25,8 @@
 
 package net.pwall.util;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 /**
@@ -140,6 +142,18 @@ public class ByteArrayBuilder {
         return this;
     }
 
+    public ByteArrayBuilder append(InputStream is) throws IOException {
+        if (is != null) {
+            for (;;) {
+                int i = is.read();
+                if (i < 0)
+                    break;
+                append(i);
+            }
+        }
+        return this;
+    }
+
     public ByteArrayBuilder insert(int index, int b) {
         if (index < 0 || index > count)
             throw new IndexOutOfBoundsException("index=" + index + "; count=" + count);
@@ -177,6 +191,14 @@ public class ByteArrayBuilder {
             count += n;
         }
         return this;
+    }
+
+    public ByteArrayBuilder create() {
+        return new ByteArrayBuilder();
+    }
+
+    public ByteArrayBuilder create(int size) {
+        return new ByteArrayBuilder(size);
     }
 
 }
