@@ -370,7 +370,7 @@ public class ParseText {
      *
      * @param   from    the start offset
      * @param   to      the end offset
-     * @return  the hexadecimal {@code long]
+     * @return  the hexadecimal {@code long}
      * @throws  NumberFormatException if any digit is invalid, or if the value is too big for an
      *          {@code int}
      */
