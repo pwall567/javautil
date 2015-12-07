@@ -187,7 +187,7 @@ public class Strings {
      * Split a string into white space delimited tokens, where white space is determined by a
      * supplied {@link SpaceTest} object.  In Java 8 lambda notation, this may be called by:
      * <pre>
-     *     String[] array = Strings.split("a b c d e", ch -> Character.isSpace(ch));
+     *     String[] array = Strings.split("a b c d e", ch -&gt; Character.isSpace(ch));
      * </pre>
      *
      * @param   s       the string to be split
@@ -439,6 +439,7 @@ public class Strings {
     /**
      * Join the string representations of the members of a collection.
      *
+     * @param   <E>         class of collection item
      * @param   collection  the collection (strictly speaking, an {@link Iterable})
      * @return  the concatenation of the string representations of the members (an empty string
      *          if the collection is empty)
@@ -450,6 +451,7 @@ public class Strings {
     /**
      * Join the string representations of the members of an {@link Iterator}.
      *
+     * @param   <E>     class of collection item
      * @param   it      the {@link Iterator}
      * @return  the concatenation of the string representations of the members (an empty string
      *          if the {@link Iterator} has no members)
@@ -467,6 +469,7 @@ public class Strings {
     /**
      * Join the string representations of the members of an {@link Enumeration}.
      *
+     * @param   <E>     class of collection item
      * @param   e       the {@link Enumeration}
      * @return  the concatenation of the string representations of the members (an empty string
      *          if the {@link Enumeration} has no members)
@@ -484,6 +487,7 @@ public class Strings {
     /**
      * Join the string representations of the members of an array.
      *
+     * @param   <E>     class of array item
      * @param   array   the array
      * @return  the concatenation of the string representations of the members (an empty string
      *          if the array is empty)
@@ -504,6 +508,7 @@ public class Strings {
      * Join the string representations of the members of a collection, with the specified
      * character separator.
      *
+     * @param   <E>         class of collection item
      * @param   collection  the collection (strictly speaking, an {@link Iterable})
      * @param   separator   the separator
      * @return  the concatenation of the string representations of the members (an empty string
@@ -517,6 +522,7 @@ public class Strings {
      * Join the string representations of the members of an {@link Iterator}, with the specified
      * character separator.
      *
+     * @param   <E>         class of collection item
      * @param   it          the {@link Iterator}
      * @param   separator   the separator
      * @return  the concatenation of the string representations of the members (an empty string
@@ -539,6 +545,7 @@ public class Strings {
      * Join the string representations of the members of an {@link Enumeration}, with the
      * specified character separator.
      *
+     * @param   <E>         class of collection item
      * @param   e           the {@link Enumeration}
      * @param   separator   the separator
      * @return  the concatenation of the string representations of the members (an empty string
@@ -561,6 +568,7 @@ public class Strings {
      * Join the string representations of the members of an array, with the specified character
      * separator.
      *
+     * @param   <E>         class of array item
      * @param   array       the array
      * @param   separator   the separator
      * @return  the concatenation of the string representations of the members (an empty string
@@ -585,6 +593,7 @@ public class Strings {
      * Join the string representations of the members of a collection, with the specified string
      * separator.
      *
+     * @param   <E>         class of collection item
      * @param   collection  the collection (strictly speaking, an {@link Iterable})
      * @param   separator   the separator
      * @return  the concatenation of the string representations of the members (an empty string
@@ -598,6 +607,7 @@ public class Strings {
      * Join the string representations of the members of an {@link Iterator}, with the specified
      * string separator.
      *
+     * @param   <E>         class of collection item
      * @param   it          the {@link Iterator}
      * @param   separator   the separator
      * @return  the concatenation of the string representations of the members (an empty string
@@ -620,6 +630,7 @@ public class Strings {
      * Join the string representations of the members of an {@link Enumeration}, with the
      * specified string separator.
      *
+     * @param   <E>         class of collection item
      * @param   e           the {@link Enumeration}
      * @param   separator   the separator
      * @return  the concatenation of the string representations of the members (an empty string
@@ -642,6 +653,7 @@ public class Strings {
      * Join the string representations of the members of an array, with the specified string
      * separator.
      *
+     * @param   <E>         class of array item
      * @param   array       the array
      * @param   separator   the separator
      * @return  the concatenation of the string representations of the members (an empty string

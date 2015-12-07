@@ -112,7 +112,7 @@ public class Ref<T> implements Serializable {
      * unequal to any non-null object, and two nulls are considered equal.  This method is
      * {@code public} and {@code static} so that it may be used as a comparison of two object
      * references even when the {@code Ref} class is not used.
-     * 
+     *
      * <p>Note - this method has been superseded since Java 1.7 by
      * {@code java.util.Objects.equals()}.</p>
      *
@@ -128,8 +128,9 @@ public class Ref<T> implements Serializable {
      * Create a new {@code Ref} where the type of the object is inferred from the type of the
      * argument.
      *
-     * @param  object   the value for the object
-     * @return the new {@code Ref}
+     * @param   <T>     class of the referred-to object
+     * @param   object  the value for the object
+     * @return  the new {@code Ref}
      */
     public static <T> Ref<T> create(T object) {
         return new Ref<>(object);

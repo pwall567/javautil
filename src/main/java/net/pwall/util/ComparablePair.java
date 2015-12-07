@@ -68,6 +68,8 @@ public class ComparablePair<F extends Comparable<? super F>, S extends Comparabl
     /**
      * Create a {@code ComparablePair}, automatically deriving the classes of the objects.
      *
+     * @param   <F>     Class of first object
+     * @param   <S>     Class of second object
      * @param   first   the value for the first object
      * @param   second  the value for the second object
      * @return  the newly-constructed {@code ComparablePair}

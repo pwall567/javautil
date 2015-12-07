@@ -119,9 +119,11 @@ public class Pair<F, S> implements Serializable {
      * Create a new {@code Pair} where the types of the two objects are inferred from the types
      * of the arguments.
      *
-     * @param  first   the value for the first object
-     * @param  second  the value for the second object
-     * @return the new {@code Pair}
+     * @param   <F>     Class of first object
+     * @param   <S>     Class of second object
+     * @param   first   the value for the first object
+     * @param   second  the value for the second object
+     * @return  the new {@code Pair}
      */
     public static <F, S> Pair<F, S> create(F first, S second) {
         return new Pair<>(first, second);

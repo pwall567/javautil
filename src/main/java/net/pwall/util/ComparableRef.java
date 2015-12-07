@@ -67,8 +67,9 @@ public class ComparableRef<T extends Comparable<? super T>> extends Ref<T>
      * {@code public} and {@code static} so that it may be used as a comparison of two object
      * references even when the {@code ComparableRef} class is not used.
      *
-     * @param  a   the first object
-     * @param  b   the second object
+     * @param   <T>     class of the objects
+     * @param   a       the first object
+     * @param   b       the second object
      * @return a negative value, zero, or a positive value, depending on whether the first
      *         object is less than, equal to, or greater than the second object
      */
