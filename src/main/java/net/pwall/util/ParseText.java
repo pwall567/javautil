@@ -334,6 +334,8 @@ public class ParseText {
         return getHexInt(start, index);
     }
 
+    private static final int MAX_INT_MASK = 0xF8 << 24;
+
     /**
      * Get an {@code int} from the text, treating the digits as hexadecimal.
      *
@@ -346,7 +348,7 @@ public class ParseText {
     public int getHexInt(int from, int to) {
         int result = 0;
         for (int i = from; i < to; i++) {
-            if ((result & 0xF8000000) != 0)
+            if ((result & MAX_INT_MASK) != 0)
                 throw new NumberFormatException();
             result = result << 4 | convertHexDigit(text.charAt(i));
         }
@@ -365,19 +367,21 @@ public class ParseText {
         return getHexLong(start, index);
     }
 
+    private static final long MAX_LONG_MASK = ((long)0xF8) << 56;
+
     /**
      * Get a {@code long} from the text, treating the digits as hexadecimal.
      *
      * @param   from    the start offset
      * @param   to      the end offset
      * @return  the hexadecimal {@code long}
-     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for an
-     *          {@code int}
+     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for a
+     *          {@code long}
      */
     public long getHexLong(int from, int to) {
         long result = 0;
         for (int i = from; i < to; i++) {
-            if ((result & 0xF800000000000000L) != 0)
+            if ((result & MAX_LONG_MASK) != 0)
                 throw new NumberFormatException();
             result = result << 4 | convertHexDigit(text.charAt(i));
         }
@@ -1205,6 +1209,8 @@ public class ParseText {
      */
     @Override
     public boolean equals(Object o) {
+        if (this == o)
+            return true;
         if (!(o instanceof ParseText))
             return false;
         ParseText pt = (ParseText)o;
