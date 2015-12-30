@@ -36,32 +36,121 @@ import java.util.List;
  */
 public class SyncQueue<T> {
 
+    public static final int defaultInitialCapacity = 10;
+    public static final int defaultMaxLength = 0;
+
     private List<T> queue;
+    private int maxLength;
 
     /**
      * Construct a {@code SyncQueue} with the specified initial capacity.
      *
-     * @param initialCapacity  the initial capacity of the queue
+     * @param   initialCapacity      the initial capacity of the queue
+     * @param   maxLength            the maximum length of the queue
+     */
+    public SyncQueue(int initialCapacity, int maxLength) {
+        queue = new ArrayList<>(initialCapacity);
+        this.maxLength = maxLength;
+    }
+
+    /**
+     * Construct a {@code SyncQueue} with the specified initial capacity.
+     *
+     * @param   initialCapacity      the initial capacity of the queue
      */
     public SyncQueue(int initialCapacity) {
-        queue = new ArrayList<>(initialCapacity);
+        this(initialCapacity, defaultMaxLength);
     }
 
     /**
      * Construct a {@code SyncQueue} with an initial capacity of 10.
      */
     public SyncQueue() {
-        this(10);
+        this(defaultInitialCapacity);
     }
 
     /**
-     * Add an object to the queue and wake up all threads currently waiting for this queue.
+     * Add an object to the end of the queue and wake up all threads currently waiting for this
+     * queue.
      *
      * @param   object  the object to be added
+     * @return  {@code true} if the object was added
      */
-    public synchronized void add(T object) {
+    public synchronized boolean add(T object) {
+        if (!checkCapacity())
+            return false;
         queue.add(object);
         notifyAll();
+        return true;
+    }
+
+    /**
+     * Add an object to the end of the queue and wake up all threads currently waiting for this
+     * queue.  If there is already an object in the queue identical to the one supplied, delete
+     * it first.
+     *
+     * @param   object  the object to be added
+     * @return  {@code true} if the object was added
+     */
+    public synchronized boolean addUnique(T object) {
+        queue.remove(object);
+        if (!checkCapacity())
+            return false;
+        queue.add(object);
+        notifyAll();
+        return true;
+    }
+
+    /**
+     * Insert an object at the beginning of the queue and wake up all threads currently waiting
+     * for this queue.
+     *
+     * @param   object  the object to be added
+     * @return  {@code true} if the object was added
+     */
+    public synchronized boolean insert(T object) {
+        if (!checkCapacity())
+            return false;
+        queue.add(0, object);
+        notifyAll();
+        return true;
+    }
+
+    /**
+     * Insert an object at the beginning of the queue and wake up all threads currently waiting
+     * for this queue.  If there is already an object in the queue identical to the one
+     * supplied, delete it first.
+     *
+     * @param   object  the object to be added
+     * @return  {@code true} if the object was added
+     */
+    public synchronized boolean insertUnique(T object) {
+        queue.remove(object);
+        if (!checkCapacity())
+            return false;
+        queue.add(0, object);
+        notifyAll();
+        return true;
+    }
+
+    /**
+     * Check that the queue has the capacity to take another entry.
+     *
+     * @return  {@code true} if the queue has capacity; {@code false} if the task was
+     *          interrupted while waiting for capacity
+     */
+    private boolean checkCapacity() {
+        if (maxLength > 0) {
+            while (queue.size() >= maxLength) {
+                try {
+                    wait();
+                }
+                catch (InterruptedException e) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -89,6 +178,24 @@ public class SyncQueue<T> {
      */
     public synchronized int getSize() {
         return queue.size();
+    }
+
+    /**
+     * Get the maximum queue length.
+     *
+     * @return  the maximum queue length
+     */
+    public synchronized int getMaxLength() {
+        return maxLength;
+    }
+
+    /**
+     * Get the maximum queue length.
+     *
+     * @param   maxLength   the maximum queue length
+     */
+    public synchronized void setMaxLength(int maxLength) {
+        this.maxLength = maxLength;
     }
 
 }
