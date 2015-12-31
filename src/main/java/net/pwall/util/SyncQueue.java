@@ -2,7 +2,7 @@
  * @(#) SyncQueue.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014 Peter Wall
+ * Copyright (c) 2013, 2014, 2015 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,20 +30,22 @@ import java.util.List;
 
 /**
  * Class to represent a synchronized first-in first-out queue.  Objects may be added to the end
- * of the queue, and reads will cause the thread to wait until data is available.
+ * or inserted at the beginning of the queue, and reads will cause the thread to wait until data
+ * is available.  An optional maximum capacity may be specified; in that case the thread trying
+ * to add to the queue will block until space is available.
  *
  * @author Peter Wall
  */
 public class SyncQueue<T> {
 
     public static final int defaultInitialCapacity = 10;
-    public static final int defaultMaxLength = 0;
+    public static final int defaultMaxLength = 0; // indicates no limit
 
     private List<T> queue;
     private int maxLength;
 
     /**
-     * Construct a {@code SyncQueue} with the specified initial capacity.
+     * Construct a {@code SyncQueue} with the specified initial capacity and maximum size.
      *
      * @param   initialCapacity      the initial capacity of the queue
      * @param   maxLength            the maximum length of the queue
@@ -63,7 +65,7 @@ public class SyncQueue<T> {
     }
 
     /**
-     * Construct a {@code SyncQueue} with an initial capacity of 10.
+     * Construct a {@code SyncQueue} with the default initial capacity.
      */
     public SyncQueue() {
         this(defaultInitialCapacity);
@@ -74,7 +76,7 @@ public class SyncQueue<T> {
      * queue.
      *
      * @param   object  the object to be added
-     * @return  {@code true} if the object was added
+     * @return  {@code true} if the operation was successful
      */
     public synchronized boolean add(T object) {
         if (!checkCapacity())
@@ -86,14 +88,15 @@ public class SyncQueue<T> {
 
     /**
      * Add an object to the end of the queue and wake up all threads currently waiting for this
-     * queue.  If there is already an object in the queue identical to the one supplied, delete
-     * it first.
+     * queue.  If there is already an object in the queue identical to the one supplied, don't
+     * add the new one.
      *
      * @param   object  the object to be added
-     * @return  {@code true} if the object was added
+     * @return  {@code true} if the operation was successful
      */
     public synchronized boolean addUnique(T object) {
-        queue.remove(object);
+        if (queue.contains(object))
+            return true;
         if (!checkCapacity())
             return false;
         queue.add(object);
@@ -106,7 +109,7 @@ public class SyncQueue<T> {
      * for this queue.
      *
      * @param   object  the object to be added
-     * @return  {@code true} if the object was added
+     * @return  {@code true} if the operation was successful
      */
     public synchronized boolean insert(T object) {
         if (!checkCapacity())
@@ -119,10 +122,10 @@ public class SyncQueue<T> {
     /**
      * Insert an object at the beginning of the queue and wake up all threads currently waiting
      * for this queue.  If there is already an object in the queue identical to the one
-     * supplied, delete it first.
+     * supplied, delete it first and insert the new one at the start.
      *
      * @param   object  the object to be added
-     * @return  {@code true} if the object was added
+     * @return  {@code true} if the operation was successful
      */
     public synchronized boolean insertUnique(T object) {
         queue.remove(object);
@@ -134,9 +137,9 @@ public class SyncQueue<T> {
     }
 
     /**
-     * Check that the queue has the capacity to take another entry.
+     * Wait for the queue to have capacity to take another entry.
      *
-     * @return  {@code true} if the queue has capacity; {@code false} if the task was
+     * @return  {@code true} if the queue has capacity; {@code false} if the thread was
      *          interrupted while waiting for capacity
      */
     private boolean checkCapacity() {
@@ -154,8 +157,21 @@ public class SyncQueue<T> {
     }
 
     /**
+     * Remove the specified object from the queue.
+     *
+     * @param   object  the object to be removed
+     * @return  {@code true} if the object was removed
+     */
+    public synchronized boolean remove(T object) {
+        if (!queue.remove(object))
+            return false;
+        notifyAll();
+        return true;
+    }
+
+    /**
      * Get the next object from the queue, blocking if none is available.  The method will
-     * return {@code null} is the thread is interrupted.
+     * return {@code null} if the thread is interrupted.
      *
      * @return  the next object, or {@code null}
      */
@@ -168,7 +184,9 @@ public class SyncQueue<T> {
                 return null;
             }
         }
-        return queue.remove(0);
+        T result = queue.remove(0);
+        notifyAll();
+        return result;
     }
 
     /**
