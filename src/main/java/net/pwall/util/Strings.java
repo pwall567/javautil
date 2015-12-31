@@ -157,6 +157,51 @@ public class Strings {
     }
 
     /**
+     * Create a string consisting of a number, space, and the singular or plural form of a given
+     * noun (using standard English plural forms, i.e.&nbsp;add the letter "s").  For example:
+     * <pre>
+     *     Strings.plural("file", 23);
+     * </pre>
+     * will return:
+     * <pre>
+     *     "23 files"
+     * </pre>
+     *
+     * @param   noun    the noun
+     * @param   n       the number
+     * @return  the string
+     */
+    public static String plural(String noun, int n) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(n).append(' ').append(noun);
+        if (n != 1)
+            sb.append('s');
+        return sb.toString();
+    }
+
+    /**
+     * Create a string consisting of a number, space, and the singular or plural noun (for use
+     * with irregular plurals).  For example:
+     * <pre>
+     *     Strings.plural("axis", "axes", 2);
+     * </pre>
+     * will return:
+     * <pre>
+     *     "2 axes"
+     * </pre>
+     *
+     * @param   singularNoun    the singular noun
+     * @param   pluralNoun      the plural noun
+     * @param   n               the number
+     * @return  the string
+     */
+    public static String plural(String singularNoun, String pluralNoun, int n) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(n).append(' ').append(n == 1 ? singularNoun : pluralNoun);
+        return sb.toString();
+    }
+
+    /**
      * Split a string into white space delimited tokens, where white space is determined by
      * {@link Character#isWhitespace(char)}.
      *
