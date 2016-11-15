@@ -224,18 +224,28 @@ public class ISO8601Date extends Date {
                         else if (text.matchAnyOf(decimalSeparators))
                             fractionHours(cal, text);
                     }
-                    if (text.match(zeroTimeZoneIndicator))
+                    if (text.match(zeroTimeZoneIndicator)) {
+                        cal.setTimeZone(TimeZone.getTimeZone("GMT"));
                         cal.set(Calendar.ZONE_OFFSET, 0);
+                    }
                     else if (text.matchAnyOf(plusOrMinus)) {
+                        StringBuilder sb = new StringBuilder("GMT");
                         char sign = text.getResultChar();
+                        sb.append(sign);
                         if (!text.matchDecFixed(2))
                             break parse;
-                        int mins = text.getResultInt() * 60;
+                        int hours = text.getResultInt();
+                        sb.append(hours);
+                        sb.append(':');
+                        int mins = 0;
                         if (text.match(timeSeparator)) {
                             if (!text.matchDecFixed(2))
                                 break parse;
-                            mins += text.getResultInt();
+                            mins = text.getResultInt();
                         }
+                        sb.append(mins);
+                        cal.setTimeZone(TimeZone.getTimeZone(sb.toString()));
+                        mins += hours * 60;
                         if (sign == minusSign)
                             mins = -mins;
                         cal.set(Calendar.ZONE_OFFSET, mins * 60 * 1_000);
@@ -281,15 +291,25 @@ public class ISO8601Date extends Date {
                         else if (text.matchAnyOf(decimalSeparators))
                             fractionHours(cal, text);
                     }
-                    if (text.match(zeroTimeZoneIndicator))
+                    if (text.match(zeroTimeZoneIndicator)) {
+                        cal.setTimeZone(TimeZone.getTimeZone("GMT"));
                         cal.set(Calendar.ZONE_OFFSET, 0);
+                    }
                     else if (text.matchAnyOf(plusOrMinus)) {
+                        StringBuilder sb = new StringBuilder("GMT");
                         char sign = text.getResultChar();
+                        sb.append(sign);
                         if (!text.matchDecFixed(2))
                             break parse;
-                        int mins = text.getResultInt() * 60;
+                        int hours = text.getResultInt();
+                        sb.append(hours);
+                        sb.append(':');
+                        int mins = 0;
                         if (text.matchDecFixed(2))
-                            mins += text.getResultInt();
+                            mins = text.getResultInt();
+                        sb.append(mins);
+                        cal.setTimeZone(TimeZone.getTimeZone(sb.toString()));
+                        mins += hours * 60;
                         if (sign == minusSign)
                             mins = -mins;
                         cal.set(Calendar.ZONE_OFFSET, mins * 60 * 1_000);
@@ -403,7 +423,7 @@ public class ISO8601Date extends Date {
      * Convert a {@link Calendar} object to an ISO 8601 string.  This function outputs to the
      * string only those fields selected in a bit mask of field designators.  Not all field
      * combinations are valid.  The bit mask values are:
-     * 
+     *
      * <dl>
      *   <dt>YEAR_MASK</dt>
      *   <dd>Output the year</dd>
@@ -425,6 +445,8 @@ public class ISO8601Date extends Date {
      *   <dd>Output the seconds</dd>
      *   <dt>MILLISECOND_MASK</dt>
      *   <dd>Output the milliseconds</dd>
+     *   <dt>ZONE_OFFSET_MASK</dt>
+     *   <dd>Output the time zone offset</dd>
      * </dl>
      *
      * @param   cal         a {@link Calendar} object
@@ -434,6 +456,7 @@ public class ISO8601Date extends Date {
      * @return  the date represented by the {@link Calendar} in ISO 8601 format
      */
     public static String toString(Calendar cal, boolean extended, int fields) {
+        int anyTimeMask = HOUR_OF_DAY_MASK | MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK;
         StringBuilder sb = new StringBuilder();
         if (fieldSet(fields, YEAR_MASK)) {
             sb.append(cal.get(Calendar.YEAR));
@@ -445,8 +468,7 @@ public class ISO8601Date extends Date {
                     if (extended)
                         sb.append(dateSeparator);
                     append2Digit(sb, cal.get(Calendar.DAY_OF_MONTH));
-                    if (fieldSet(fields,
-                            HOUR_OF_DAY_MASK | MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK)) {
+                    if (fieldSet(fields, anyTimeMask)) {
                         sb.append(dateTimeSeparator);
                         appendTime(sb, cal, extended, fields);
                     }
@@ -467,8 +489,7 @@ public class ISO8601Date extends Date {
                             break;
                         }
                     }
-                    if (fieldSet(fields,
-                            HOUR_OF_DAY_MASK | MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK)) {
+                    if (fieldSet(fields, anyTimeMask)) {
                         sb.append(dateTimeSeparator);
                         appendTime(sb, cal, extended, fields);
                     }
@@ -478,8 +499,7 @@ public class ISO8601Date extends Date {
                 if (extended)
                     sb.append(dateSeparator);
                 append3Digit(sb, cal.get(Calendar.DAY_OF_YEAR));
-                if (fieldSet(fields,
-                        HOUR_OF_DAY_MASK | MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK)) {
+                if (fieldSet(fields, anyTimeMask)) {
                     sb.append(dateTimeSeparator);
                     appendTime(sb, cal, extended, fields);
                 }
@@ -488,7 +508,10 @@ public class ISO8601Date extends Date {
         else
             appendTime(sb, cal, extended, fields);
         if (fieldSet(fields, ZONE_OFFSET_MASK)) {
-            int mins = cal.get(Calendar.ZONE_OFFSET) / 60_000;
+            int mins = cal.get(Calendar.ZONE_OFFSET);
+            if (cal.getTimeZone().inDaylightTime(cal.getTime()))
+                mins += cal.get(Calendar.DST_OFFSET);
+            mins /= 60 * 1000;
             if (mins == 0)
                 sb.append(zeroTimeZoneIndicator);
             else {
