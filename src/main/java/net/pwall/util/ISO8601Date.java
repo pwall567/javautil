@@ -248,7 +248,7 @@ public class ISO8601Date extends Date {
                         mins += hours * 60;
                         if (sign == minusSign)
                             mins = -mins;
-                        cal.set(Calendar.ZONE_OFFSET, mins * 60 * 1_000);
+                        cal.set(Calendar.ZONE_OFFSET, mins * 60 * 1000);
                     }
                 }
                 else {
@@ -312,7 +312,7 @@ public class ISO8601Date extends Date {
                         mins += hours * 60;
                         if (sign == minusSign)
                             mins = -mins;
-                        cal.set(Calendar.ZONE_OFFSET, mins * 60 * 1_000);
+                        cal.set(Calendar.ZONE_OFFSET, mins * 60 * 1000);
                     }
                 }
                 if (!text.isExhausted())
@@ -325,12 +325,12 @@ public class ISO8601Date extends Date {
 
     private static void fractionHours(Calendar cal, ParseText text) {
         checkFraction(text);
-        long millis = adjustFraction(text.getResultLong() * 3_600, text.getResultLength());
-        cal.set(Calendar.MINUTE, (int)(millis / 60_000));
-        millis %= 60_000;
+        long millis = adjustFraction(text.getResultLong() * 3600, text.getResultLength());
+        cal.set(Calendar.MINUTE, (int)(millis / 60000));
+        millis %= 60000;
         if (millis != 0) {
-            cal.set(Calendar.SECOND, (int)(millis / 1_000));
-            millis %= 1_000;
+            cal.set(Calendar.SECOND, (int)(millis / 1000));
+            millis %= 1000;
             if (millis != 0)
                 cal.set(Calendar.MILLISECOND, (int)millis);
         }
@@ -339,8 +339,8 @@ public class ISO8601Date extends Date {
     private static void fractionMinutes(Calendar cal, ParseText text) {
         checkFraction(text);
         long millis = adjustFraction(text.getResultLong() * 60, text.getResultLength());
-        cal.set(Calendar.SECOND, (int)(millis / 1_000));
-        millis %= 1_000;
+        cal.set(Calendar.SECOND, (int)(millis / 1000));
+        millis %= 1000;
         if (millis != 0)
             cal.set(Calendar.MILLISECOND, (int)millis);
     }
@@ -558,7 +558,7 @@ public class ISO8601Date extends Date {
     }
 
     private static void append3Digit(StringBuilder sb, int n) {
-        n = Math.abs(n) % 1_000;
+        n = Math.abs(n) % 1000;
         if (n < 100) {
             sb.append('0');
             if (n < 10)

@@ -31,7 +31,7 @@ public class OrderedSet<E> extends AbstractSet<E> {
      * @param   comparator  the comparator that determines the order of the set
      */
     public OrderedSet(Comparator<E> comparator) {
-        list = new ArrayList<>();
+        list = new ArrayList<E>();
         this.comparator = comparator;
     }
 
@@ -167,7 +167,7 @@ public class OrderedSet<E> extends AbstractSet<E> {
      * @return          the new set
      */
     public static <C extends Comparable<C>> OrderedSet<C> create() {
-        return new OrderedSet<>(new Comparator<C>() {
+        return new OrderedSet<C>(new Comparator<C>() {
             @Override public int compare(C o1, C o2) {
                 return o1.compareTo(o2);
             }

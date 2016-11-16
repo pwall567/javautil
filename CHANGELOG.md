@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [Unreleased]
 ### Changed
+- Changed Java version to 1.6 to allow creation of version for older systems
+
+## [1.0.3] - 2015-11-15
+### Changed
 - Modified `ISO8601Date` to improve handling of time zones
 
 ### Added

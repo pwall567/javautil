@@ -76,7 +76,7 @@ public class ComparablePair<F extends Comparable<? super F>, S extends Comparabl
      */
     public static <F extends Comparable<? super F>, S extends Comparable<? super S>>
             ComparablePair<F, S> create(F first, S second) {
-        return new ComparablePair<>(first, second);
+        return new ComparablePair<F, S>(first, second);
     }
 
 }

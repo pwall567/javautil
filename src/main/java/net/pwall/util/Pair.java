@@ -126,7 +126,7 @@ public class Pair<F, S> implements Serializable {
      * @return  the new {@code Pair}
      */
     public static <F, S> Pair<F, S> create(F first, S second) {
-        return new Pair<>(first, second);
+        return new Pair<F, S>(first, second);
     }
 
 }

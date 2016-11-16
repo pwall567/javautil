@@ -93,27 +93,27 @@ public class Strings {
             a.append("minus ");
             if (n == Integer.MIN_VALUE) { // can't simply negate MIN_VALUE
                 a.append("two billion, ");
-                n = (int)(0x80000000L % 1_000_000_000);
+                n = (int)(0x80000000L % 1000000000);
             }
             else
                 n = -n;
         }
     concat: {
-            if (n >= 1_000_000_000) { // signed 32-bit int can't be greater than three billion
-                appendEnglish(a, n / 1_000_000_000).append(" billion");
-                if ((n %= 1_000_000_000) == 0)
+            if (n >= 1000000000) { // signed 32-bit int can't be greater than three billion
+                appendEnglish(a, n / 1000000000).append(" billion");
+                if ((n %= 1000000000) == 0)
                     break concat;
                 a.append(n >= 100 ? ", " : " and ");
             }
-            if (n >= 1_000_000) {
-                appendEnglish(a, n / 1_000_000).append(" million");
-                if ((n %= 1_000_000) == 0)
+            if (n >= 1000000) {
+                appendEnglish(a, n / 1000000).append(" million");
+                if ((n %= 1000000) == 0)
                     break concat;
                 a.append(n >= 100 ? ", " : " and ");
             }
-            if (n >= 1_000) {
-                appendEnglish(a, n / 1_000).append(" thousand");
-                if ((n %= 1_000) == 0)
+            if (n >= 1000) {
+                appendEnglish(a, n / 1000).append(" thousand");
+                if ((n %= 1000) == 0)
                     break concat;
                 a.append(n >= 100 ? ", " : " and ");
             }

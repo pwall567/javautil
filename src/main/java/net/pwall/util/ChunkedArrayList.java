@@ -70,7 +70,7 @@ public class ChunkedArrayList<E> extends AbstractList<E> implements RandomAccess
     public ChunkedArrayList(int chunkSize, int initialChunks) {
         if (chunkSize < minimumChunkSize)
             throw new IllegalArgumentException("Chunk size " + chunkSize + " too low");
-        outerList = new ArrayList<>(initialChunks);
+        outerList = new ArrayList<List<E>>(initialChunks);
         this.chunkSize = chunkSize;
     }
 
@@ -139,7 +139,7 @@ public class ChunkedArrayList<E> extends AbstractList<E> implements RandomAccess
         int n = outerList.size();
         List<E> innerList;
         if (n == 0 || (innerList = outerList.get(n - 1)).size() == chunkSize) {
-            innerList = new ArrayList<>(chunkSize);
+            innerList = new ArrayList<E>(chunkSize);
             outerList.add(innerList);
         }
         innerList.add(e);
@@ -233,7 +233,7 @@ public class ChunkedArrayList<E> extends AbstractList<E> implements RandomAccess
             j++;
             i = 0;
         }
-        List<E> innerList = new ArrayList<>(chunkSize);
+        List<E> innerList = new ArrayList<E>(chunkSize);
         outerList.add(innerList);
         innerList.add(element);
     }

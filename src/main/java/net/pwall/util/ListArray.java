@@ -38,7 +38,7 @@ public class ListArray<T> extends AbstractList<T> implements RandomAccess {
     }
 
     public static <E> ListArray<E> asList(E[] array) {
-        return new ListArray<>(array);
+        return new ListArray<E>(array);
     }
 
 }

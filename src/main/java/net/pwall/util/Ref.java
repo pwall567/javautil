@@ -133,7 +133,7 @@ public class Ref<T> implements Serializable {
      * @return  the new {@code Ref}
      */
     public static <T> Ref<T> create(T object) {
-        return new Ref<>(object);
+        return new Ref<T>(object);
     }
 
 }

@@ -51,7 +51,7 @@ public class SyncQueue<T> {
      * @param   maxLength            the maximum length of the queue
      */
     public SyncQueue(int initialCapacity, int maxLength) {
-        queue = new ArrayList<>(initialCapacity);
+        queue = new ArrayList<T>(initialCapacity);
         this.maxLength = maxLength;
     }
 
