@@ -28,7 +28,6 @@ package net.pwall.util;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.Objects;
 
 /**
  * String utility functions.
@@ -1694,7 +1693,7 @@ public class Strings {
      * @throws  NullPointerException if either argument is {@code null}
      */
     public static String trim(String s, SpaceTest spaceTest) {
-        Objects.requireNonNull(spaceTest);
+        requireNonNull(spaceTest);
         int start = 0;
         int end = s.length();
         for (;;) {
@@ -1719,7 +1718,7 @@ public class Strings {
      * @throws  NullPointerException if either argument is {@code null}
      */
     public static CharSequence trim(CharSequence cs, SpaceTest spaceTest) {
-        Objects.requireNonNull(spaceTest);
+        requireNonNull(spaceTest);
         int start = 0;
         int end = cs.length();
         for (;;) {
@@ -1768,7 +1767,7 @@ public class Strings {
      * @throws NullPointerException if either argument is {@code null}
      */
     public static String trimUTF16(String s, SpaceTest spaceTest) {
-        Objects.requireNonNull(spaceTest);
+        requireNonNull(spaceTest);
         int start = 0;
         int end = s.length();
         for (;;) {
@@ -1846,6 +1845,12 @@ public class Strings {
             i = i / 26 - 1;
         } while (i >= 0);
         return sb.toString();
+    }
+
+    private static <T> T requireNonNull(T obj) {
+        if (obj == null)
+            throw new NullPointerException();
+        return obj;
     }
 
 }

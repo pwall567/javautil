@@ -113,9 +113,6 @@ public class Ref<T> implements Serializable {
      * {@code public} and {@code static} so that it may be used as a comparison of two object
      * references even when the {@code Ref} class is not used.
      *
-     * <p>Note - this method has been superseded since Java 1.7 by
-     * {@code java.util.Objects.equals()}.</p>
-     *
      * @param  a   the first object
      * @param  b   the second object
      * @return {@code true} if the first object is equal to the second object

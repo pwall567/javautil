@@ -11,7 +11,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -58,7 +57,7 @@ public class OrderedSet<E> extends AbstractSet<E> {
     @Override
     public boolean contains(Object o) {
         @SuppressWarnings("unchecked")
-        E c = (E)Objects.requireNonNull(o);
+        E c = (E)requireNonNull(o);
         int lo = 0;
         int hi = list.size();
         while (lo < hi) {
@@ -84,7 +83,7 @@ public class OrderedSet<E> extends AbstractSet<E> {
      */
     @Override
     public boolean add(E e) {
-        Objects.requireNonNull(e);
+        requireNonNull(e);
         int lo = 0;
         int hi = list.size();
         while (lo < hi) {
@@ -112,7 +111,7 @@ public class OrderedSet<E> extends AbstractSet<E> {
     @Override
     public boolean remove(Object o) {
         @SuppressWarnings("unchecked")
-        E c = (E)Objects.requireNonNull(o);
+        E c = (E)requireNonNull(o);
         int lo = 0;
         int hi = list.size();
         while (lo < hi) {
@@ -200,6 +199,12 @@ public class OrderedSet<E> extends AbstractSet<E> {
             list.remove(--index);
         }
 
+    }
+
+    private static <T> T requireNonNull(T obj) {
+        if (obj == null)
+            throw new NullPointerException();
+        return obj;
     }
 
 }
