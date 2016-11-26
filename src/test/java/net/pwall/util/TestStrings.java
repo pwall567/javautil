@@ -98,4 +98,29 @@ public class TestStrings {
                 Strings.toEnglish(0x80000000));
     }
 
+    @Test
+    public void test_appendInt() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int i = 123456789;
+        Strings.appendInt(sb, i);
+        assertEquals(String.valueOf(i), sb.toString());
+        sb = new StringBuilder();
+        i = -1000;
+        Strings.appendInt(sb, i);
+        assertEquals(String.valueOf(i), sb.toString());
+        sb = new StringBuilder();
+        i = Integer.MAX_VALUE;
+        Strings.appendInt(sb, i);
+        assertEquals(String.valueOf(i), sb.toString());
+        sb = new StringBuilder();
+        i = Integer.MIN_VALUE;
+        Strings.appendInt(sb, i);
+        assertEquals(String.valueOf(i), sb.toString());
+        for (i = -20000; i < 20000; i++) {
+            sb = new StringBuilder();
+            Strings.appendInt(sb, i);
+            assertEquals(String.valueOf(i), sb.toString());
+        }
+    }
+
 }

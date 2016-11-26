@@ -3,7 +3,9 @@ Added this change log after project was already under way.  Early changes are no
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
-## [Unreleased]
+## [1.1]
+### Added
+- New method `Strings.appendInrt()` (optimised output of int values) 
 ### Changed
 - Modified `ISO8601Date` to improve handling of time zones
 
