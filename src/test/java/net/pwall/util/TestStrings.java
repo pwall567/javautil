@@ -123,4 +123,29 @@ public class TestStrings {
         }
     }
 
+    @Test
+    public void test_appendLong() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        long i = 123456789123456789L;
+        Strings.appendLong(sb, i);
+        assertEquals(String.valueOf(i), sb.toString());
+        sb = new StringBuilder();
+        i = -1000;
+        Strings.appendLong(sb, i);
+        assertEquals(String.valueOf(i), sb.toString());
+        sb = new StringBuilder();
+        i = Long.MAX_VALUE;
+        Strings.appendLong(sb, i);
+        assertEquals(String.valueOf(i), sb.toString());
+        sb = new StringBuilder();
+        i = Long.MIN_VALUE;
+        Strings.appendLong(sb, i);
+        assertEquals(String.valueOf(i), sb.toString());
+        for (i = -20000; i < 20000; i++) {
+            sb = new StringBuilder();
+            Strings.appendLong(sb, i);
+            assertEquals(String.valueOf(i), sb.toString());
+        }
+    }
+
 }

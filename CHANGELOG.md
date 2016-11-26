@@ -4,13 +4,13 @@ Added this change log after project was already under way.  Early changes are no
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
 ## [1.1]
-### Added
-- New method `Strings.appendInrt()` (optimised output of int values) 
 ### Changed
 - Modified `ISO8601Date` to improve handling of time zones
 
 ### Added
 - Rudimentary unit test for `ISO8601Date`
+- New method `Strings.appendInt()` (optimised output of int values)
+- Also `Strings.appendLong()`
 
 ## [1.0.2] - 2015-12-31
 ### Changed

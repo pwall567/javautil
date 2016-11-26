@@ -1919,5 +1919,49 @@ public class Strings {
             a.append(digits[i]);
     }
 
+    /**
+     * Append a {@code long} to an {@link Appendable}.  This method outputs the digits left to
+     * right, avoiding the need to allocate a separate buffer.
+     *
+     * @param   a   the {@link Appendable}
+     * @param   n   the {@code long}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void appendLong(Appendable a, long n) throws IOException {
+        if (n < 0) {
+            if (n == Long.MIN_VALUE) {
+                a.append("-9223372036854775808");
+                return;
+            }
+            a.append('-');
+            appendPositiveLong(a, -n);
+        }
+        else
+            appendPositiveLong(a, n);
+    }
+
+    /**
+     * Append a positive {@code long} to an {@link Appendable}.  This method outputs the digits
+     * left to right, avoiding the need to allocate a separate buffer.
+     *
+     * @param   a   the {@link Appendable}
+     * @param   n   the {@code int}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void appendPositiveLong(Appendable a, long n) throws IOException {
+        if (n >= 100) {
+            long m = n / 100;
+            appendPositiveLong(a, m);
+            int i = (int)(n - m * 100);
+            a.append(tensDigits[i]);
+            a.append(digits[i]);
+        }
+        else if (n >= 10) {
+            a.append(tensDigits[(int)n]);
+            a.append(digits[(int)n]);
+        }
+        else
+            a.append(digits[(int)n]);
+    }
 
 }
