@@ -1996,8 +1996,9 @@ public class Strings {
      * @throws  IOException if thrown by the {@link Appendable}
      */
     public static void append3Digits(Appendable a, int i) throws IOException {
-        a.append(digits[i / 100]);
-        i %= 100;
+        int n = i / 100;
+        a.append(digits[n]);
+        i -= n * 100;
         a.append(tensDigits[i]);
         a.append(digits[i]);
     }
