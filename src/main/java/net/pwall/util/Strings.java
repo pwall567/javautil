@@ -1968,7 +1968,8 @@ public class Strings {
      * Append an {@code int} to an {@link Appendable} as two decimal digits.  There is often a
      * requirement to output a number as 2 digits, for example the cents value in dollars and
      * cents, or hours, minutes and seconds in a time string.  Note that there is no range check
-     * on the input value; to use this method in cases where the value is not known, use:
+     * on the input value; to use this method in cases where the value is not guaranteed to be
+     * in the range 00-99, use:
      * <pre>
      *     Strings.append2Digits(a, Math.abs(i) % 100);
      * </pre>
@@ -1986,7 +1987,7 @@ public class Strings {
      * Append an {@code int} to an {@link Appendable} as three decimal digits.  There is less
      * frequently a requirement to output a number as 3 digits, for example the milliseconds in
      * a time string.  Note that there is no range check on the input value; to use this method
-     * in cases where the value is not known, use:
+     * in cases where the value is not guaranteed to be in the range 000-999, use:
      * <pre>
      *     Strings.append3Digits(a, Math.abs(i) % 1000);
      * </pre>
