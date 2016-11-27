@@ -1945,7 +1945,7 @@ public class Strings {
      * left to right, avoiding the need to allocate a separate buffer.
      *
      * @param   a   the {@link Appendable}
-     * @param   n   the {@code int}
+     * @param   n   the {@code long}
      * @throws  IOException if thrown by the {@link Appendable}
      */
     public static void appendPositiveLong(Appendable a, long n) throws IOException {
