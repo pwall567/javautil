@@ -1983,7 +1983,7 @@ public class Strings {
     }
 
     /**
-     * Append an {@code int} to an {@link Appendable} as three decimal digits.  There less
+     * Append an {@code int} to an {@link Appendable} as three decimal digits.  There is less
      * frequently a requirement to output a number as 3 digits, for example the milliseconds in
      * a time string.  Note that there is no range check on the input value; to use this method
      * in cases where the value is not known, use:
