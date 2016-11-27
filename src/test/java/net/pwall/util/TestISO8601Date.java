@@ -26,7 +26,8 @@ public class TestISO8601Date {
         cal.set(Calendar.HOUR_OF_DAY, 14);
         cal.set(Calendar.MINUTE, 8);
         cal.set(Calendar.SECOND, 32);
-        assertEquals("2016-11-15T14:08:32.000+11:00", ISO8601Date.toString(cal, true, -1));
+        cal.set(Calendar.MILLISECOND, 567);
+        assertEquals("2016-11-15T14:08:32.567+11:00", ISO8601Date.toString(cal, true, -1));
     }
 
 }

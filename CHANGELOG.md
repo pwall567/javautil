@@ -3,14 +3,14 @@ Added this change log after project was already under way.  Early changes are no
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
-## [1.1]
+## [1.1] - 2016-11-27
 ### Changed
-- Modified `ISO8601Date` to improve handling of time zones
+- Modified `ISO8601Date` to improve handling of time zones, and to use new `Strings` methods
 
 ### Added
 - Rudimentary unit test for `ISO8601Date`
 - New method `Strings.appendInt()` (optimised output of int values)
-- Also `Strings.appendLong()`
+- Also `Strings.appendLong()`, `Strings.append2Digits`, `Strings.append3Digits`
 
 ## [1.0.2] - 2015-12-31
 ### Changed

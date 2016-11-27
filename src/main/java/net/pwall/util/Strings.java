@@ -2,7 +2,7 @@
  * @(#) Strings.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014, 2015 Peter Wall
+ * Copyright (c) 2013, 2014, 2015, 2016 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -1962,6 +1962,44 @@ public class Strings {
         }
         else
             a.append(digits[(int)n]);
+    }
+
+    /**
+     * Append an {@code int} to an {@link Appendable} a two decimal digits.  There is often a
+     * requirement to output a number as 2 digits, for example the cents value in dollars and
+     * cents, or hours, minutes and seconds in a time string.  Note that there is no range check
+     * on the input value; to use this method in cases where the value is not known, use:
+     * <pre>
+     *     Strings.append2Digits(a, Math.abs(i) % 100);
+     * </pre>
+     *
+     * @param   a   the {@link Appendable}
+     * @param   i   the {@code int}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void append2Digits(Appendable a, int i) throws IOException {
+        a.append(tensDigits[i]);
+        a.append(digits[i]);
+    }
+
+    /**
+     * Append an {@code int} to an {@link Appendable} a three decimal digits.  There less
+     * frequently a requirement to output a number as 3 digits, for example the milliseconds in
+     * a time string.  Note that there is no range check on the input value; to use this method
+     * in cases where the value is not known, use:
+     * <pre>
+     *     Strings.append3Digits(a, Math.abs(i) % 1000);
+     * </pre>
+     *
+     * @param   a   the {@link Appendable}
+     * @param   i   the {@code int}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void append3Digits(Appendable a, int i) throws IOException {
+        a.append(digits[i / 100]);
+        i %= 100;
+        a.append(tensDigits[i]);
+        a.append(digits[i]);
     }
 
 }

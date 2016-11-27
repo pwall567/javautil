@@ -2,7 +2,7 @@
  * @(#) ISO8601Date.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014 Peter Wall
+ * Copyright (c) 2013, 2014, 2016 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 
 package net.pwall.util;
 
+import java.io.IOException;
 import java.text.DecimalFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
@@ -127,14 +128,19 @@ public class ISO8601Date extends Date {
 
     public static String toString(Date date, TimeZone timeZone) {
         StringBuilder sb = new StringBuilder(10);
-        Calendar cal =
-                Calendar.getInstance(timeZone != null ? timeZone : TimeZone.getDefault());
-        cal.setTime(date);
-        sb.append(cal.get(Calendar.YEAR));
-        sb.append(dateSeparator);
-        append2Digit(sb, cal.get(Calendar.MONTH) + 1);
-        sb.append(dateSeparator);
-        append2Digit(sb, cal.get(Calendar.DAY_OF_MONTH));
+        try {
+            Calendar cal =
+                    Calendar.getInstance(timeZone != null ? timeZone : TimeZone.getDefault());
+            cal.setTime(date);
+            sb.append(cal.get(Calendar.YEAR));
+            sb.append(dateSeparator);
+            Strings.append2Digits(sb, cal.get(Calendar.MONTH) + 1);
+            sb.append(dateSeparator);
+            Strings.append2Digits(sb, cal.get(Calendar.DAY_OF_MONTH));
+        }
+        catch (IOException e) {
+            // can't happen - StringBuilder.append() does not throw IOException
+        }
         return sb.toString();
     }
 
@@ -458,71 +464,76 @@ public class ISO8601Date extends Date {
     public static String toString(Calendar cal, boolean extended, int fields) {
         int anyTimeMask = HOUR_OF_DAY_MASK | MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK;
         StringBuilder sb = new StringBuilder();
-        if (fieldSet(fields, YEAR_MASK)) {
-            sb.append(cal.get(Calendar.YEAR));
-            if (fieldSet(fields, MONTH_MASK)) {
-                if (extended)
-                    sb.append(dateSeparator);
-                append2Digit(sb, cal.get(Calendar.MONTH) + 1);
-                if (fieldSet(fields, DAY_OF_MONTH_MASK)) {
+        try {
+            if (fieldSet(fields, YEAR_MASK)) {
+                sb.append(cal.get(Calendar.YEAR));
+                if (fieldSet(fields, MONTH_MASK)) {
                     if (extended)
                         sb.append(dateSeparator);
-                    append2Digit(sb, cal.get(Calendar.DAY_OF_MONTH));
-                    if (fieldSet(fields, anyTimeMask)) {
-                        sb.append(dateTimeSeparator);
-                        appendTime(sb, cal, extended, fields);
-                    }
-                }
-            }
-            else if (fieldSet(fields, WEEK_OF_YEAR_MASK)) {
-                if (extended)
-                    sb.append(dateSeparator);
-                sb.append(weekNumberSeparator);
-                append2Digit(sb, cal.get(Calendar.WEEK_OF_YEAR));
-                if (fieldSet(fields, DAY_OF_WEEK_MASK)) {
-                    int d = cal.get(Calendar.DAY_OF_WEEK);
-                    for (int i = 1; i < 8; i++) {
-                        if (parseDays[i] == d) {
-                            if (extended)
-                                sb.append(dateSeparator);
-                            sb.append(i);
-                            break;
+                    Strings.append2Digits(sb, cal.get(Calendar.MONTH) + 1);
+                    if (fieldSet(fields, DAY_OF_MONTH_MASK)) {
+                        if (extended)
+                            sb.append(dateSeparator);
+                        Strings.append2Digits(sb, cal.get(Calendar.DAY_OF_MONTH));
+                        if (fieldSet(fields, anyTimeMask)) {
+                            sb.append(dateTimeSeparator);
+                            appendTime(sb, cal, extended, fields);
                         }
                     }
+                }
+                else if (fieldSet(fields, WEEK_OF_YEAR_MASK)) {
+                    if (extended)
+                        sb.append(dateSeparator);
+                    sb.append(weekNumberSeparator);
+                    Strings.append2Digits(sb, cal.get(Calendar.WEEK_OF_YEAR));
+                    if (fieldSet(fields, DAY_OF_WEEK_MASK)) {
+                        int d = cal.get(Calendar.DAY_OF_WEEK);
+                        for (int i = 1; i < 8; i++) {
+                            if (parseDays[i] == d) {
+                                if (extended)
+                                    sb.append(dateSeparator);
+                                sb.append(i);
+                                break;
+                            }
+                        }
+                        if (fieldSet(fields, anyTimeMask)) {
+                            sb.append(dateTimeSeparator);
+                            appendTime(sb, cal, extended, fields);
+                        }
+                    }
+                }
+                else if (fieldSet(fields, DAY_OF_YEAR_MASK)) {
+                    if (extended)
+                        sb.append(dateSeparator);
+                    Strings.append3Digits(sb, cal.get(Calendar.DAY_OF_YEAR));
                     if (fieldSet(fields, anyTimeMask)) {
                         sb.append(dateTimeSeparator);
                         appendTime(sb, cal, extended, fields);
                     }
                 }
             }
-            else if (fieldSet(fields, DAY_OF_YEAR_MASK)) {
-                if (extended)
-                    sb.append(dateSeparator);
-                append3Digit(sb, cal.get(Calendar.DAY_OF_YEAR));
-                if (fieldSet(fields, anyTimeMask)) {
-                    sb.append(dateTimeSeparator);
-                    appendTime(sb, cal, extended, fields);
+            else
+                appendTime(sb, cal, extended, fields);
+            if (fieldSet(fields, ZONE_OFFSET_MASK)) {
+                int mins = cal.get(Calendar.ZONE_OFFSET);
+                if (cal.getTimeZone().inDaylightTime(cal.getTime()))
+                    mins += cal.get(Calendar.DST_OFFSET);
+                mins /= 60 * 1000;
+                if (mins == 0)
+                    sb.append(zeroTimeZoneIndicator);
+                else {
+                    sb.append(mins < 0 ? minusSign : plusSign);
+                    mins = Math.abs(mins);
+                    Strings.append2Digits(sb, mins / 60);
+                    mins %= 60;
+                    if (extended)
+                        sb.append(timeSeparator);
+                    Strings.append2Digits(sb, mins);
                 }
             }
         }
-        else
-            appendTime(sb, cal, extended, fields);
-        if (fieldSet(fields, ZONE_OFFSET_MASK)) {
-            int mins = cal.get(Calendar.ZONE_OFFSET);
-            if (cal.getTimeZone().inDaylightTime(cal.getTime()))
-                mins += cal.get(Calendar.DST_OFFSET);
-            mins /= 60 * 1000;
-            if (mins == 0)
-                sb.append(zeroTimeZoneIndicator);
-            else {
-                sb.append(mins < 0 ? minusSign : plusSign);
-                mins = Math.abs(mins);
-                append2Digit(sb, mins / 60);
-                mins %= 60;
-                if (extended)
-                    sb.append(timeSeparator);
-                append2Digit(sb, mins);
-            }
+        catch (IOException e) {
+            // can't happen - StringBuilder.append() does not throw IOException
         }
         return sb.toString();
     }
@@ -532,39 +543,22 @@ public class ISO8601Date extends Date {
     }
 
     private static void appendTime(StringBuilder sb, Calendar cal, boolean extended,
-            int fields) {
-        append2Digit(sb, cal.get(Calendar.HOUR_OF_DAY));
+            int fields) throws IOException {
+        Strings.append2Digits(sb, cal.get(Calendar.HOUR_OF_DAY));
         if ((fields & (MINUTE_MASK | SECOND_MASK | MILLISECOND_MASK)) != 0) {
             if (extended)
                 sb.append(timeSeparator);
-            append2Digit(sb, cal.get(Calendar.MINUTE));
+            Strings.append2Digits(sb, cal.get(Calendar.MINUTE));
             if ((fields & (SECOND_MASK | MILLISECOND_MASK)) != 0) {
                 if (extended)
                     sb.append(timeSeparator);
-                append2Digit(sb, cal.get(Calendar.SECOND));
+                Strings.append2Digits(sb, cal.get(Calendar.SECOND));
                 if ((fields & MILLISECOND_MASK) != 0) {
                     sb.append(defaultDecimalSeparator);
-                    append3Digit(sb, cal.get(Calendar.MILLISECOND));
+                    Strings.append3Digits(sb, cal.get(Calendar.MILLISECOND));
                 }
             }
         }
-    }
-
-    private static void append2Digit(StringBuilder sb, int n) {
-        n = Math.abs(n) % 100;
-        if (n < 10)
-            sb.append('0');
-        sb.append(n);
-    }
-
-    private static void append3Digit(StringBuilder sb, int n) {
-        n = Math.abs(n) % 1_000;
-        if (n < 100) {
-            sb.append('0');
-            if (n < 10)
-                sb.append('0');
-        }
-        sb.append(n);
     }
 
 }
