@@ -3,6 +3,10 @@ Added this change log after project was already under way.  Early changes are no
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.2] - 2017-02-19
+### Added
+- New class `ReaderBuffer`
+
 ## [1.1] - 2016-11-27
 ### Changed
 - Modified `ISO8601Date` to improve handling of time zones, and to use new `Strings` methods
