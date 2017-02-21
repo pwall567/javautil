@@ -41,7 +41,7 @@ public class ReaderBuffer implements CharSequence {
     public static final int defaultBufferSize = 4096;
 
     private int bufferSize;
-    private ArrayList<char[]> buffers; // not a generic List - must allow random access
+    private char[][] buffers;
     private int length;
     private String str;
 
@@ -62,8 +62,8 @@ public class ReaderBuffer implements CharSequence {
 
         this.bufferSize = bufferSize;
         str = null;
-        buffers = new ArrayList<>();
         length = 0;
+        ArrayList<char[]> bufferList = new ArrayList<>();
 
         // outer loop - read one buffer at a time
 
@@ -86,11 +86,16 @@ public class ReaderBuffer implements CharSequence {
 
             // add buffer to list
 
-            buffers.add(cbuf);
+            bufferList.add(cbuf);
             length += bufferSize - len;
             if (len > 0) // inner loop terminated early - EOF
                 break;
         }
+
+        // get buffer list as array
+
+        buffers = new char[bufferList.size()][];
+        bufferList.toArray(buffers);
     }
 
     /**
@@ -127,7 +132,7 @@ public class ReaderBuffer implements CharSequence {
     public char charAt(int index) {
         if (index < 0 || index >= length)
             throw new IndexOutOfBoundsException(String.valueOf(index));
-        return buffers.get(index / bufferSize)[index % bufferSize];
+        return buffers[index / bufferSize][index % bufferSize];
     }
 
     /**
@@ -161,14 +166,14 @@ public class ReaderBuffer implements CharSequence {
 
             // append buffers 0 to n-1
 
-            int lastbuffer = buffers.size() - 1;
+            int lastbuffer = buffers.length - 1;
             for (int i = 0; i < lastbuffer; i++)
-                sb.append(buffers.get(i));
+                sb.append(buffers[i]);
 
             // append last buffer (if there is one)
 
             if (lastbuffer >= 0)
-                sb.append(buffers.get(lastbuffer), 0, length - lastbuffer * bufferSize);
+                sb.append(buffers[lastbuffer], 0, length - lastbuffer * bufferSize);
             str = sb.toString();
         }
         return str;
