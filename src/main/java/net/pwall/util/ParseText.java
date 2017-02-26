@@ -2,7 +2,7 @@
  * @(#) ParseText.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014 Peter Wall
+ * Copyright (c) 2013, 2014, 2017 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,6 +42,11 @@ import java.util.Collection;
  * <p>For use following a successful match operation, there are several "{@code getResult}"
  * operations that will extract the matched characters from the text in a variety of forms
  * ({@code int}, {@code long}, {@link String} etc.).</p>
+ *
+ * <p>The class takes text in the form of a {@link CharSequence} rather than a {@link String},
+ * and some implementations of {@link CharSequence} allow modification of the contents.  The
+ * results of any method of this class are undefined in the case of concurrent modification of
+ * the text.</p>
  *
  * @author Peter Wall
  */
@@ -245,8 +250,8 @@ public class ParseText {
     /**
      * Get the result of the last match operation as an {@code int}.
      *
-     * @return  the result of the last match as an {@code int}
-     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for an
+     * @return  the result of the last match as an {@code int} (always positive)
+     * @throws  NumberFormatException if the start and end indices do not describe a valid
      *          {@code int}
      */
     public int getResultInt() {
@@ -258,11 +263,15 @@ public class ParseText {
      *
      * @param   from    the start offset
      * @param   to      the end offset
-     * @return  the {@code int}
-     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for an
+     * @return  the {@code int} (always positive)
+     * @throws  NumberFormatException if the start and end indices do not describe a valid
      *          {@code int}
+     * @throws  IndexOutOfBoundsException if the start and end indices are not contained within
+     *          the text
      */
     public int getInt(int from, int to) {
+        if (to <= from)
+            throw new NumberFormatException();
         int result = 0;
         for (int i = from; i < to; i++) {
             int n = convertDecDigit(text.charAt(i));
@@ -279,8 +288,8 @@ public class ParseText {
     /**
      * Get the result of the last match operation as a {@code long}.
      *
-     * @return  the result of the last match as a {@code long}
-     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for a
+     * @return  the result of the last match as a {@code long} (always positive)
+     * @throws  NumberFormatException if the start and end indices do not describe a valid
      *          {@code long}
      */
     public long getResultLong() {
@@ -292,11 +301,15 @@ public class ParseText {
      *
      * @param   from    the start offset
      * @param   to      the end offset
-     * @return  the {@code long}
-     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for a
+     * @return  the {@code long} (always positive)
+     * @throws  NumberFormatException if the start and end indices do not describe a valid
      *          {@code long}
+     * @throws  IndexOutOfBoundsException if the start and end indices are not contained within
+     *          the text
      */
     public long getLong(int from, int to) {
+        if (to <= from)
+            throw new NumberFormatException();
         long result = 0;
         for (int i = from; i < to; i++) {
             int n = convertDecDigit(text.charAt(i));
@@ -326,8 +339,8 @@ public class ParseText {
      * Get the result of the last match operation as an {@code int}, treating the digits as
      * hexadecimal.
      *
-     * @return  the result of the last match as an {@code int}
-     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for an
+     * @return  the result of the last match as an {@code int} (always positive)
+     * @throws  NumberFormatException if the start and end indices do not describe a valid
      *          {@code int}
      */
     public int getResultHexInt() {
@@ -341,11 +354,15 @@ public class ParseText {
      *
      * @param   from    the start offset
      * @param   to      the end offset
-     * @return  the hexadecimal {@code int}
-     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for an
+     * @return  the hexadecimal {@code int} (always positive)
+     * @throws  NumberFormatException if the start and end indices do not describe a valid
      *          {@code int}
+     * @throws  IndexOutOfBoundsException if the start and end indices are not contained within
+     *          the text
      */
     public int getHexInt(int from, int to) {
+        if (to <= from)
+            throw new NumberFormatException();
         int result = 0;
         for (int i = from; i < to; i++) {
             if ((result & MAX_INT_MASK) != 0)
@@ -359,8 +376,8 @@ public class ParseText {
      * Get the result of the last match operation as a {@code long}, treating the digits as
      * hexadecimal.
      *
-     * @return  the result of the last match as a {@code long}
-     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for a
+     * @return  the result of the last match as a {@code long} (always positive)
+     * @throws  NumberFormatException if the start and end indices do not describe a valid
      *          {@code long}
      */
     public long getResultHexLong() {
@@ -374,11 +391,15 @@ public class ParseText {
      *
      * @param   from    the start offset
      * @param   to      the end offset
-     * @return  the hexadecimal {@code long}
-     * @throws  NumberFormatException if any digit is invalid, or if the value is too big for a
+     * @return  the hexadecimal {@code long} (always positive)
+     * @throws  NumberFormatException if the start and end indices do not describe a valid
      *          {@code long}
+     * @throws  IndexOutOfBoundsException if the start and end indices are not contained within
+     *          the text
      */
     public long getHexLong(int from, int to) {
+        if (to <= from)
+            throw new NumberFormatException();
         long result = 0;
         for (int i = from; i < to; i++) {
             if ((result & MAX_LONG_MASK) != 0)
@@ -622,11 +643,14 @@ public class ParseText {
      * Following a successful match the start index will point to the matched character and the
      * index will be incremented past it.
      *
-     * @param array the characters to match against (as a array)
+     * @param array the characters to match against (as an array or varargs list)
      * @return      {@code true} if the character in the text matches any of the characters in
      *              the array
+     * @throws      IllegalArgumentException if the array is empty
      */
-    public boolean matchAnyOf(char[] array) {
+    public boolean matchAnyOf(char ... array) {
+        if (array.length == 0)
+            throw new IllegalArgumentException("Array must not be empty");
         if (index >= text.length())
             return false;
         char ch = text.charAt(index);
@@ -692,11 +716,14 @@ public class ParseText {
      * start index will point to the first character of the matched sequence and the index will
      * be incremented past it.
      *
-     * @param array     the array of {@link CharSequence}
+     * @param array     the array (or varargs list) of {@link CharSequence}
      * @return          {@code true} if the characters in the text at the index match any of the
      *                  entries in the array
+     * @throws      IllegalArgumentException if the array is empty
      */
-    public boolean matchAnyOf(CharSequence[] array) {
+    public boolean matchAnyOf(CharSequence ... array) {
+        if (array.length == 0)
+            throw new IllegalArgumentException("Array must not be empty");
         for (CharSequence str : array)
             if (match(str))
                 return true;
@@ -921,10 +948,13 @@ public class ParseText {
      * Increment the index to the next occurrence of any of the given characters.  The index is
      * left positioned at the matched character.
      *
-     * @param   array   the array of possible stopper characters
+     * @param   array   the array (or varargs list) of possible stopper characters
      * @return          the {@code ParseText} object (for chaining purposes)
+     * @throws      IllegalArgumentException if the array is empty
      */
-    public ParseText skipToAnyOf(char[] array) {
+    public ParseText skipToAnyOf(char ... array) {
+        if (array.length == 0)
+            throw new IllegalArgumentException("Array must not be empty");
         int i = index;
         start = i;
     outer:
@@ -945,8 +975,11 @@ public class ParseText {
      *
      * @param   stoppers    a {@link CharSequence} of possible stopper characters
      * @return              the {@code ParseText} object (for chaining purposes)
+     * @throws              IllegalArgumentException if the {@link CharSequence} is empty
      */
     public ParseText skipToAnyOf(CharSequence stoppers) {
+        if (stoppers.length() == 0)
+            throw new IllegalArgumentException("String must not be empty");
         int i = index;
         start = i;
     outer:
