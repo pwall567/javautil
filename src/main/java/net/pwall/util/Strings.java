@@ -2,7 +2,7 @@
  * @(#) Strings.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014, 2015 Peter Wall
+ * Copyright (c) 2013, 2014, 2015, 2016 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,8 +40,8 @@ public class Strings {
     private static final String[] numberNamesEnglish = { "zero", "one", "two", "three", "four",
             "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen",
             "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen" };
-    private static final String[] tensNamesEnglish = { "ten", "twenty", "thirty", "forty",
-            "fifty", "sixty", "seventy", "eighty", "ninety" };
+    private static final String[] tensNamesEnglish = { "twenty", "thirty", "forty", "fifty",
+            "sixty", "seventy", "eighty", "ninety" };
 
     private static char[] hexDigits = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A',
             'B', 'C', 'D', 'E', 'F' };
@@ -124,7 +124,7 @@ public class Strings {
                 a.append(" and ");
             }
             if (n >= 20) {
-                a.append(tensNamesEnglish[n / 10 - 1]);
+                a.append(tensNamesEnglish[n / 10 - 2]);
                 if ((n %= 10) != 0)
                     a.append('-');
             }
@@ -1113,23 +1113,29 @@ public class Strings {
         return bab.toByteArray();
     }
 
-    public static void appendUTF8(ByteArrayBuilder bab, int codePoint) {
-        if (codePoint <= 0x7F)
-            bab.append(codePoint);
-        else if (codePoint <= 0x7FF) {
-            bab.append((codePoint >> 6) | 0xC0);
-            bab.append((codePoint & 0x3F) | 0x80);
+    /**
+     * Append a codepoint to a {@link ByteArrayBuilder} as UTF-8.
+     *
+     * @param   bab         the {@link ByteArrayBuilder}
+     * @param   codepoint   the codepoint
+     */
+    public static void appendUTF8(ByteArrayBuilder bab, int codepoint) {
+        if (codepoint <= 0x7F)
+            bab.append(codepoint);
+        else if (codepoint <= 0x7FF) {
+            bab.append((codepoint >> 6) | 0xC0);
+            bab.append((codepoint & 0x3F) | 0x80);
         }
-        else if (codePoint <= 0xFFFF) {
-            bab.append((codePoint >> 12) | 0xE0);
-            bab.append(((codePoint >> 6) & 0x3F) | 0x80);
-            bab.append((codePoint & 0x3F) | 0x80);
+        else if (codepoint <= 0xFFFF) {
+            bab.append((codepoint >> 12) | 0xE0);
+            bab.append(((codepoint >> 6) & 0x3F) | 0x80);
+            bab.append((codepoint & 0x3F) | 0x80);
         }
         else {
-            bab.append(((codePoint >> 18) & 0x7) | 0xF0);
-            bab.append(((codePoint >> 12) & 0x3F) | 0x80);
-            bab.append(((codePoint >> 6) & 0x3F) | 0x80);
-            bab.append((codePoint & 0x3F) | 0x80);
+            bab.append(((codepoint >> 18) & 0x7) | 0xF0);
+            bab.append(((codepoint >> 12) & 0x3F) | 0x80);
+            bab.append(((codepoint >> 6) & 0x3F) | 0x80);
+            bab.append((codepoint & 0x3F) | 0x80);
         }
     }
 
@@ -1846,6 +1852,162 @@ public class Strings {
             i = i / 26 - 1;
         } while (i >= 0);
         return sb.toString();
+    }
+
+    private static char[] digits = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+    };
+
+    private static char[] tensDigits = {
+            '0', '0', '0', '0', '0', '0', '0', '0', '0', '0',
+            '1', '1', '1', '1', '1', '1', '1', '1', '1', '1',
+            '2', '2', '2', '2', '2', '2', '2', '2', '2', '2',
+            '3', '3', '3', '3', '3', '3', '3', '3', '3', '3',
+            '4', '4', '4', '4', '4', '4', '4', '4', '4', '4',
+            '5', '5', '5', '5', '5', '5', '5', '5', '5', '5',
+            '6', '6', '6', '6', '6', '6', '6', '6', '6', '6',
+            '7', '7', '7', '7', '7', '7', '7', '7', '7', '7',
+            '8', '8', '8', '8', '8', '8', '8', '8', '8', '8',
+            '9', '9', '9', '9', '9', '9', '9', '9', '9', '9'
+    };
+
+    /**
+     * Append an {@code int} to an {@link Appendable}.  This method outputs the digits left to
+     * right, avoiding the need to allocate a separate buffer.
+     *
+     * @param   a   the {@link Appendable}
+     * @param   i   the {@code int}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void appendInt(Appendable a, int i) throws IOException {
+        if (i < 0) {
+            if (i == Integer.MIN_VALUE) {
+                a.append("-2147483648");
+                return;
+            }
+            a.append('-');
+            appendPositiveInt(a, -i);
+        }
+        else
+            appendPositiveInt(a, i);
+    }
+
+    /**
+     * Append a positive {@code int} to an {@link Appendable}.  This method outputs the digits
+     * left to right, avoiding the need to allocate a separate buffer.
+     *
+     * @param   a   the {@link Appendable}
+     * @param   i   the {@code int}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void appendPositiveInt(Appendable a, int i) throws IOException {
+        if (i >= 100) {
+            int n = i / 100;
+            appendPositiveInt(a, n);
+            i -= n * 100;
+            a.append(tensDigits[i]);
+            a.append(digits[i]);
+        }
+        else if (i >= 10) {
+            a.append(tensDigits[i]);
+            a.append(digits[i]);
+        }
+        else
+            a.append(digits[i]);
+    }
+
+    /**
+     * Append a {@code long} to an {@link Appendable}.  This method outputs the digits left to
+     * right, avoiding the need to allocate a separate buffer.
+     *
+     * @param   a   the {@link Appendable}
+     * @param   n   the {@code long}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void appendLong(Appendable a, long n) throws IOException {
+        if (n < 0) {
+            if (n == Long.MIN_VALUE) {
+                a.append("-9223372036854775808");
+                return;
+            }
+            a.append('-');
+            appendPositiveLong(a, -n);
+        }
+        else
+            appendPositiveLong(a, n);
+    }
+
+    /**
+     * Append a positive {@code long} to an {@link Appendable}.  This method outputs the digits
+     * left to right, avoiding the need to allocate a separate buffer.
+     *
+     * @param   a   the {@link Appendable}
+     * @param   n   the {@code long}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void appendPositiveLong(Appendable a, long n) throws IOException {
+        if (n >= 100) {
+            long m = n / 100;
+            appendPositiveLong(a, m);
+            int i = (int)(n - m * 100);
+            a.append(tensDigits[i]);
+            a.append(digits[i]);
+        }
+        else if (n >= 10) {
+            a.append(tensDigits[(int)n]);
+            a.append(digits[(int)n]);
+        }
+        else
+            a.append(digits[(int)n]);
+    }
+
+    /**
+     * Append an {@code int} to an {@link Appendable} as two decimal digits.  There is often a
+     * requirement to output a number as 2 digits, for example the cents value in dollars and
+     * cents, or hours, minutes and seconds in a time string.  Note that there is no range check
+     * on the input value; to use this method in cases where the value is not guaranteed to be
+     * in the range 00-99, use:
+     * <pre>
+     *     Strings.append2Digits(a, Math.abs(i) % 100);
+     * </pre>
+     *
+     * @param   a   the {@link Appendable}
+     * @param   i   the {@code int}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void append2Digits(Appendable a, int i) throws IOException {
+        a.append(tensDigits[i]);
+        a.append(digits[i]);
+    }
+
+    /**
+     * Append an {@code int} to an {@link Appendable} as three decimal digits.  There is less
+     * frequently a requirement to output a number as 3 digits, for example the milliseconds in
+     * a time string.  Note that there is no range check on the input value; to use this method
+     * in cases where the value is not guaranteed to be in the range 000-999, use:
+     * <pre>
+     *     Strings.append3Digits(a, Math.abs(i) % 1000);
+     * </pre>
+     *
+     * @param   a   the {@link Appendable}
+     * @param   i   the {@code int}
+     * @throws  IOException if thrown by the {@link Appendable}
+     */
+    public static void append3Digits(Appendable a, int i) throws IOException {
+        int n = i / 100;
+        a.append(digits[n]);
+        i -= n * 100;
+        a.append(tensDigits[i]);
+        a.append(digits[i]);
     }
 
 }
