@@ -73,6 +73,18 @@ public class TestStrings {
     }
 
     @Test
+    public void test_split_ST() {
+        String s1 = "the quick brown fox jumps over the lazy dog";
+        String[] result = Strings.split(s1, ch -> ch == 'o');
+        assertEquals(5, result.length);
+        assertEquals("the quick br", result[0]);
+        assertEquals("wn f", result[1]);
+        assertEquals("x jumps ", result[2]);
+        assertEquals("ver the lazy d", result[3]);
+        assertEquals("g", result[4]);
+    }
+
+    @Test
     public void test_toIdentifier() {
         assertEquals("A", Strings.toIdentifier(0));
         assertEquals("B", Strings.toIdentifier(1));
