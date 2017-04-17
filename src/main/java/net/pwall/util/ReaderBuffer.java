@@ -124,7 +124,7 @@ public class ReaderBuffer implements CharSequence {
      *
      * @param   index   the index
      * @return  the character
-     * @throws  IndexOutOfBoundsException if index < 0 or > length
+     * @throws  IndexOutOfBoundsException if index less than 0 or greater than length
      * @see     CharSequence#charAt(int)
      */
     @Override

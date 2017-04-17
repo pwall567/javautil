@@ -81,6 +81,7 @@ public class ListArray<T> extends AbstractList<T> implements RandomAccess {
      * Convenience method to construct a {@code ListArray} from an array.
      *
      * @param   array   the array
+     * @param   <E>     the type of the array elements
      * @return  the {@code ListArray}
      * @throws  NullPointerException if the array is {@code null}
      */
