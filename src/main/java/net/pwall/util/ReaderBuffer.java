@@ -71,11 +71,11 @@ public class ReaderBuffer implements CharSequence {
 
             // inner loop - read from Reader until buffer is filled
 
-            char[] cbuf = new char[bufferSize];
+            char[] buffer = new char[bufferSize];
             int len = bufferSize;
             int offset = 0;
             do {
-                int n = rdr.read(cbuf, offset, len);
+                int n = rdr.read(buffer, offset, len);
                 if (n < 0) // EOF
                     break;
                 offset += n;
@@ -86,7 +86,7 @@ public class ReaderBuffer implements CharSequence {
 
             // add buffer to list
 
-            bufferList.add(cbuf);
+            bufferList.add(buffer);
             length += bufferSize - len;
             if (len > 0) // inner loop terminated early - EOF
                 break;
@@ -94,8 +94,7 @@ public class ReaderBuffer implements CharSequence {
 
         // get buffer list as array
 
-        buffers = new char[bufferList.size()][];
-        bufferList.toArray(buffers);
+        buffers = bufferList.toArray(new char[bufferList.size()][]);
     }
 
     /**
@@ -150,7 +149,7 @@ public class ReaderBuffer implements CharSequence {
     }
 
     /**
-     * Get the string from this {@link CharSequence}.  The result is strored for subsequent
+     * Get the string from this {@link CharSequence}.  The result is stored for subsequent
      * re-use.
      *
      * @return  the string containing all the characters of this {@link CharSequence}
@@ -179,10 +178,26 @@ public class ReaderBuffer implements CharSequence {
         return str;
     }
 
+    /**
+     * Convenience method to convert the contents of a {@link Reader} to a {@link String}.
+     *
+     * @param   rdr     the {@link Reader}
+     * @return          the {@link String}
+     * @throws IOException if thrown by the {@link Reader}
+     */
     public static String toString(Reader rdr) throws IOException {
         return (new ReaderBuffer(rdr)).toString();
     }
 
+    /**
+     * Convenience method to convert the contents of a {@link Reader} to a {@link String} using
+     * a specified buffer size.
+     *
+     * @param   rdr         the {@link Reader}
+     * @param   bufferSize  the buffer size
+     * @return              the {@link String}
+     * @throws IOException if thrown by the {@link Reader}
+     */
     public static String toString(Reader rdr, int bufferSize) throws IOException {
         return (new ReaderBuffer(rdr, bufferSize)).toString();
     }
