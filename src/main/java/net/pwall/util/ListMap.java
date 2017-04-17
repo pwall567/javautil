@@ -48,7 +48,7 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
 
     private static final long serialVersionUID = -5594713182082941289L;
 
-    private List<ListMap.Entry<K, V>> list;
+    protected List<ListMap.Entry<K, V>> list;
 
     /**
      * Construct an empty {@code ListMap}.
@@ -283,7 +283,7 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
      * @param   key     the key
      * @return          the index for this key, or -1 if not found
      */
-    private int findIndex(Object key) {
+    protected int findIndex(Object key) {
         for (int i = 0, n = list.size(); i < n; i++)
             if (list.get(i).getKey().equals(key))
                 return i;
