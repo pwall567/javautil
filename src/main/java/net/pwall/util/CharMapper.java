@@ -37,7 +37,7 @@ package net.pwall.util;
  * @see     Strings#escapeUTF16(CharSequence, CharMapper)
  * @see     Strings#escapeUTF16(String, CharMapper)
  */
-//@FunctionalInterface
+@FunctionalInterface
 public interface CharMapper {
 
     /**
