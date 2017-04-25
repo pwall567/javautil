@@ -35,23 +35,20 @@ public class URI {
     public static final String errorMessage = "URI %xx sequence invalid";
 
     /** A {@link CharMapper} for use with {@link Strings#escape(String, CharMapper)} etc. */
-    public static final CharMapper charMapper = new AbstractCharMapper() {
-        @Override
-        public String map(int cp) {
-            if (cp > 0x7F) {
-                StringBuilder sb = new StringBuilder();
-                ByteArrayBuilder bab = new ByteArrayBuilder();
-                Strings.appendUTF8(bab, cp);
-                for (int i = 0; i < bab.length(); i++)
-                    sb.append(hexMapping(bab.get(i), 2, "%"));
-                return sb.toString();
-            }
-            if (cp == ' ')
-                return "+";
-            if (!isUnreserved(cp))
-                return hexMapping(cp, 2, "%", null);
-            return null;
+    public static final CharMapper charMapper = cp -> {
+        if (cp > 0x7F) {
+            StringBuilder sb = new StringBuilder();
+            ByteArrayBuilder bab = new ByteArrayBuilder();
+            Strings.appendUTF8(bab, cp);
+            for (int i = 0; i < bab.length(); i++)
+                sb.append(CharMapper.hexMapping(bab.get(i), 2, "%"));
+            return sb.toString();
         }
+        if (cp == ' ')
+            return "+";
+        if (!isUnreserved(cp))
+            return CharMapper.hexMapping(cp, 2, "%", null);
+        return null;
     };
 
     /** A {@link CharUnmapper} for use with {@link Strings#unescape(String, CharUnmapper)}
@@ -69,8 +66,7 @@ public class URI {
                 return 1;
             }
             if (offset + 3 <= s.length()) {
-                sb.append((char)(convertHexDigit(s.charAt(offset + 1)) * 16 +
-                        convertHexDigit(s.charAt(offset + 2))));
+                sb.append((char)Strings.convertHexToInt(s, offset + 1, offset + 3));
                 return 3;
             }
             throw new IllegalArgumentException(errorMessage);
@@ -118,23 +114,6 @@ public class URI {
      */
     public static String unescape(String s) {
         return Strings.unescape(s, charUnmapper);
-    }
-
-    /**
-     * Convert a hex digit to {@code int}.
-     *
-     * @param   ch  the character containg the hex digit
-     * @return      the {@code int}
-     * @throws      IllegalArgumentException if the character is not a hex digit
-     */
-    protected static int convertHexDigit(char ch) {
-        if (ch >= '0' && ch <= '9')
-            return ch - '0';
-        if (ch >= 'A' && ch <= 'F')
-            return ch - 'A' + 10;
-        if (ch >= 'a' && ch <= 'f')
-            return ch - 'a' + 10;
-        throw new IllegalArgumentException(errorMessage);
     }
 
 }
