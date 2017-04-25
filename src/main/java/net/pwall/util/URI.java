@@ -35,23 +35,20 @@ public class URI {
     public static final String errorMessage = "URI %xx sequence invalid";
 
     /** A {@link CharMapper} for use with {@link Strings#escape(String, CharMapper)} etc. */
-    public static final CharMapper charMapper = new AbstractCharMapper() {
-        @Override
-        public String map(int cp) {
-            if (cp > 0x7F) {
-                StringBuilder sb = new StringBuilder();
-                ByteArrayBuilder bab = new ByteArrayBuilder();
-                Strings.appendUTF8(bab, cp);
-                for (int i = 0; i < bab.length(); i++)
-                    sb.append(hexMapping(bab.get(i), 2, "%"));
-                return sb.toString();
-            }
-            if (cp == ' ')
-                return "+";
-            if (!isUnreserved(cp))
-                return hexMapping(cp, 2, "%", null);
-            return null;
+    public static final CharMapper charMapper = cp -> {
+        if (cp > 0x7F) {
+            StringBuilder sb = new StringBuilder();
+            ByteArrayBuilder bab = new ByteArrayBuilder();
+            Strings.appendUTF8(bab, cp);
+            for (int i = 0; i < bab.length(); i++)
+                sb.append(CharMapper.hexMapping(bab.get(i), 2, "%"));
+            return sb.toString();
         }
+        if (cp == ' ')
+            return "+";
+        if (!isUnreserved(cp))
+            return CharMapper.hexMapping(cp, 2, "%", null);
+        return null;
     };
 
     /** A {@link CharUnmapper} for use with {@link Strings#unescape(String, CharUnmapper)}

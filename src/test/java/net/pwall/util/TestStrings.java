@@ -160,4 +160,124 @@ public class TestStrings {
         }
     }
 
+    @Test
+    public void test_appendHex_B() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        byte b = 0;
+        Strings.appendHex(sb, b);
+        assertEquals("00", sb.toString());
+        sb = new StringBuilder();
+        b = 8;
+        Strings.appendHex(sb, b);
+        assertEquals("08", sb.toString());
+        sb = new StringBuilder();
+        b = (byte)0x80;
+        Strings.appendHex(sb, b);
+        assertEquals("80", sb.toString());
+        sb = new StringBuilder();
+        b = (byte)0xFF;
+        Strings.appendHex(sb, b);
+        assertEquals("FF", sb.toString());
+    }
+
+    @Test
+    public void test_appendHex_C() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        char ch = 0;
+        Strings.appendHex(sb, ch);
+        assertEquals("0000", sb.toString());
+        sb = new StringBuilder();
+        ch = ' ';
+        Strings.appendHex(sb, ch);
+        assertEquals("0020", sb.toString());
+        sb = new StringBuilder();
+        ch = (char)0x8000;
+        Strings.appendHex(sb, ch);
+        assertEquals("8000", sb.toString());
+        sb = new StringBuilder();
+        ch = (char)0xFFFF;
+        Strings.appendHex(sb, ch);
+        assertEquals("FFFF", sb.toString());
+    }
+
+    @Test
+    public void test_appendHex_I() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        Strings.appendHex(sb, i);
+        assertEquals("00000000", sb.toString());
+        sb = new StringBuilder();
+        i = 64;
+        Strings.appendHex(sb, i);
+        assertEquals("00000040", sb.toString());
+        sb = new StringBuilder();
+        i = 65537;
+        Strings.appendHex(sb, i);
+        assertEquals("00010001", sb.toString());
+        sb = new StringBuilder();
+        i = -1;
+        Strings.appendHex(sb, i);
+        assertEquals("FFFFFFFF", sb.toString());
+    }
+
+    @Test
+    public void test_appendHex_I2() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        Strings.appendHex(sb, i, 3);
+        assertEquals("000", sb.toString());
+        sb = new StringBuilder();
+        i = 64;
+        Strings.appendHex(sb, i, 10);
+        assertEquals("0000000040", sb.toString());
+        sb = new StringBuilder();
+        i = 65537;
+        Strings.appendHex(sb, i, 5);
+        assertEquals("10001", sb.toString());
+        sb = new StringBuilder();
+        i = -1;
+        Strings.appendHex(sb, i, 10);
+        assertEquals("00FFFFFFFF", sb.toString());
+    }
+
+    @Test
+    public void test_appendHex_L() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        long m = 0;
+        Strings.appendHex(sb, m);
+        assertEquals("0000000000000000", sb.toString());
+        sb = new StringBuilder();
+        m = 64;
+        Strings.appendHex(sb, m);
+        assertEquals("0000000000000040", sb.toString());
+        sb = new StringBuilder();
+        m = 65537;
+        Strings.appendHex(sb, m);
+        assertEquals("0000000000010001", sb.toString());
+        sb = new StringBuilder();
+        m = -1;
+        Strings.appendHex(sb, m);
+        assertEquals("FFFFFFFFFFFFFFFF", sb.toString());
+    }
+
+    @Test
+    public void test_appendHex_L2() throws IOException {
+        StringBuilder sb = new StringBuilder();
+        long m = 0;
+        Strings.appendHex(sb, m, 3);
+        assertEquals("000", sb.toString());
+        sb = new StringBuilder();
+        m = 64;
+        Strings.appendHex(sb, m, 20);
+        assertEquals("00000000000000000040", sb.toString());
+        sb = new StringBuilder();
+        m = 65537;
+        Strings.appendHex(sb, m, 7);
+        assertEquals("0010001", sb.toString());
+        sb = new StringBuilder();
+        m = -1;
+        Strings.appendHex(sb, m, 40);
+        assertEquals("000000000000000000000000FFFFFFFFFFFFFFFF", sb.toString());
+    }
+
 }

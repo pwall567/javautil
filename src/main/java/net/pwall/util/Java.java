@@ -35,50 +35,44 @@ import java.io.IOException;
  */
 public class Java {
 
-    public static final CharMapper stringMapper = new AbstractCharMapper() {
-        @Override
-        public String map(int codePoint) {
-            if (codePoint == '"')
-                return "\\\"";
-            if (codePoint == '\\')
-                return "\\\\";
-            if (codePoint >= ' ' && codePoint < 0x7F)
-                return null;
-            if (codePoint == '\n')
-                return "\\n";
-            if (codePoint == '\r')
-                return "\\r";
-            if (codePoint == '\t')
-                return "\\t";
-            if (codePoint == '\b')
-                return "\\b";
-            if (codePoint == '\f')
-                return "\\f";
-            return hexMapping(codePoint, 4, "\\u");
-        }
+    public static final CharMapper stringMapper = codePoint -> {
+        if (codePoint == '"')
+            return "\\\"";
+        if (codePoint == '\\')
+            return "\\\\";
+        if (codePoint >= ' ' && codePoint < 0x7F)
+            return null;
+        if (codePoint == '\n')
+            return "\\n";
+        if (codePoint == '\r')
+            return "\\r";
+        if (codePoint == '\t')
+            return "\\t";
+        if (codePoint == '\b')
+            return "\\b";
+        if (codePoint == '\f')
+            return "\\f";
+        return CharMapper.hexMapping(codePoint, 4, "\\u");
     };
 
-    public static final CharMapper charMapper = new AbstractCharMapper() {
-        @Override
-        public String map(int codePoint) {
-            if (codePoint == '\'')
-                return "\\'";
-            if (codePoint == '\\')
-                return "\\\\";
-            if (codePoint >= ' ' && codePoint < 0x7F)
-                return null;
-            if (codePoint == '\n')
-                return "\\n";
-            if (codePoint == '\r')
-                return "\\r";
-            if (codePoint == '\t')
-                return "\\t";
-            if (codePoint == '\b')
-                return "\\b";
-            if (codePoint == '\f')
-                return "\\f";
-            return hexMapping(codePoint, 4, "\\u");
-        }
+    public static final CharMapper charMapper = codePoint -> {
+        if (codePoint == '\'')
+            return "\\'";
+        if (codePoint == '\\')
+            return "\\\\";
+        if (codePoint >= ' ' && codePoint < 0x7F)
+            return null;
+        if (codePoint == '\n')
+            return "\\n";
+        if (codePoint == '\r')
+            return "\\r";
+        if (codePoint == '\t')
+            return "\\t";
+        if (codePoint == '\b')
+            return "\\b";
+        if (codePoint == '\f')
+            return "\\f";
+        return CharMapper.hexMapping(codePoint, 4, "\\u");
     };
 
     /**

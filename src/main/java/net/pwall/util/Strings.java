@@ -1407,6 +1407,22 @@ public class Strings {
     }
 
     /**
+     * Append an integer value as hexadecimal to an {@link Appendable}, specifying the number of
+     * output digits.
+     *
+     * @param   a       the {@link Appendable}
+     * @param   i       the number
+     * @param   digits  the number of digits
+     * @throws IOException if thrown by the {@link Appendable}
+     */
+    public static void appendHex(Appendable a, int i, int digits) throws IOException {
+        if (digits > 0) {
+            appendHex(a, i >>> 4, digits - 1);
+            a.append(hexDigits[i & 0xF]);
+        }
+    }
+
+    /**
      * Append a long value as hexadecimal to an {@link Appendable}.
      *
      * @param   a       the {@link Appendable}
@@ -1416,6 +1432,22 @@ public class Strings {
     public static void appendHex(Appendable a, long n) throws IOException {
         appendHex(a, (int)(n >>> 32));
         appendHex(a, (int)n);
+    }
+
+    /**
+     * Append a long value as hexadecimal to an {@link Appendable}, specifying the number of
+     * output digits.
+     *
+     * @param   a       the {@link Appendable}
+     * @param   n       the number
+     * @param   digits  the number of digits
+     * @throws IOException if thrown by the {@link Appendable}
+     */
+    public static void appendHex(Appendable a, long n, int digits) throws IOException {
+        if (digits > 0) {
+            appendHex(a, n >>> 4, digits - 1);
+            a.append(hexDigits[(int)(n & 0xF)]);
+        }
     }
 
     private static final int MAX_INT_DIV_10 = Integer.MAX_VALUE / 10;
