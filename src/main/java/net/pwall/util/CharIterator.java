@@ -2,7 +2,7 @@
  * @(#) CharIterator.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014 Peter Wall
+ * Copyright (c) 2013, 2014, 2017 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,9 @@ import java.util.NoSuchElementException;
 
 /**
  * An iterator over the characters of a {@link CharSequence} (a {@link String},
- * {@link StringBuilder} etc.).
+ * {@link StringBuilder} etc.).  If the {@link CharSequence} provided is mutable, and the
+ * contents are changed during the life of the {@code CharIterator}, the results are
+ * undefined.
  *
  * @author Peter Wall
  */
@@ -40,6 +42,15 @@ public class CharIterator implements Iterator<Character> {
     private int index;
     private int limit;
 
+    /**
+     * Construct a {@code CharIterator} with a given {@link CharSequence}, specifying the start
+     * and end points.
+     *
+     * @param   seq     the {@link CharSequence}
+     * @param   start   the start index
+     * @param   end     the end index
+     * @throws  IndexOutOfBoundsException if the start or end index is invalid
+     */
     public CharIterator(CharSequence seq, int start, int end) {
         if (seq == null)
             throw new NullPointerException();
@@ -50,25 +61,31 @@ public class CharIterator implements Iterator<Character> {
         limit = end;
     }
 
+    /**
+     * Construct a {@code CharIterator} over an entire {@link CharSequence}.
+     *
+     * @param   seq     the {@link CharSequence}
+     */
     public CharIterator(CharSequence seq) {
         this(seq, 0, seq.length());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasNext() {
         return index < limit;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Character next() {
         if (!hasNext())
             throw new NoSuchElementException();
         return Character.valueOf(seq.charAt(index++));
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException();
     }
 
 }
