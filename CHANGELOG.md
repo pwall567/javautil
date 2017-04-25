@@ -3,6 +3,14 @@ Added this change log after project was already under way.  Early changes are no
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [Unreleased]
+### Changed
+- Multiple classes modified for Java 8
+- Added JavaDoc to several classes
+
+### Removed
+- `AbstractCharMapper` (functionality moved to `CharMapper` interface)
+
 ## [1.3]
 ### Changed
 - Added JavaDoc to `ListArray`
