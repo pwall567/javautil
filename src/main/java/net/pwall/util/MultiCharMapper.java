@@ -30,7 +30,7 @@ package net.pwall.util;
  *
  * @author Peter Wall
  */
-public class MultiCharMapper extends AbstractCharMapper {
+public class MultiCharMapper implements CharMapper {
 
     private CharMapper[] mappers;
 

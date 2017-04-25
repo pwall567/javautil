@@ -2,7 +2,7 @@
  * @(#) ArrayIterator.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014 Peter Wall
+ * Copyright (c) 2013, 2014, 2017 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,33 +30,40 @@ import java.util.NoSuchElementException;
 /**
  * An {@link Iterator} over the members of an array.  The iterator does not allow removals.
  *
- * @author Peter Wall
+ * @author  Peter Wall
+ * @param   <E> the type of the array element
  */
 public class ArrayIterator<E> implements Iterator<E> {
 
     private E[] array;
     private int index;
 
+    /**
+     * Construct an interator over the given array.
+     *
+     * @param   array   the array
+     */
     public ArrayIterator(E[] array) {
         this.array = array;
         index = 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean hasNext() {
         return index < array.length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public E next() {
         if (!hasNext())
             throw new NoSuchElementException();
         return array[index++];
-    }
-
-    @Override
-    public void remove() {
-        throw new UnsupportedOperationException();
     }
 
 }

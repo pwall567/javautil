@@ -2,7 +2,7 @@
  * @(#) SortedListMap.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Peter Wall
+ * Copyright (c) 2017 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,9 @@ import java.util.Objects;
  * An implementation of {@link Map} that uses a {@link List} to hold the entries in sorted
  * order.  The keys are required to implement {@link Comparable}.
  *
- * @author      Peter Wall
+ * @author  Peter Wall
+ * @param   <K>         the key type
+ * @param   <V>         the value type
  */
 public class SortedListMap<K extends Comparable<K>, V> extends ListMap<K, V> {
 

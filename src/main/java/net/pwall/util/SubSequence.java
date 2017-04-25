@@ -25,6 +25,8 @@
 
 package net.pwall.util;
 
+import java.util.Objects;
+
 /**
  * A sub-sequence of a {@link CharSequence}.
  *
@@ -38,9 +40,17 @@ public class SubSequence implements CharSequence {
     private int end;
     private String string;
 
+    /**
+     * Create a sub-sequence from the specified {@link CharSequence}.
+     *
+     * @param   seq     the original {@link CharSequence}
+     * @param   start   the start index of the sub-sequence
+     * @param   end     the end index of the sub-sequence
+     * @throws  NullPointerException if the original {@link CharSequence} is {@code null}
+     * @throws  IllegalArgumentException if the start or end index is invalid
+     */
     public SubSequence(CharSequence seq, int start, int end) {
-        if (seq == null)
-            throw new IllegalArgumentException("SubSequence parent may not be null");
+        Objects.requireNonNull(seq);
         if (start < 0 || start > seq.length())
             throw new IllegalArgumentException("SubSequence start incorrect");
         if (end < start || end > seq.length())
@@ -51,11 +61,17 @@ public class SubSequence implements CharSequence {
         string = null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int length() {
         return end - start;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public char charAt(int index) {
         int i = index + start;
@@ -64,6 +80,9 @@ public class SubSequence implements CharSequence {
         return seq.charAt(i);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public CharSequence subSequence(int start, int end) {
         int len = length();
@@ -74,6 +93,9 @@ public class SubSequence implements CharSequence {
         return new SubSequence(seq, start + this.start, end + this.start);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         // note - this is not synchronized, so in rare cases it may be performed twice;

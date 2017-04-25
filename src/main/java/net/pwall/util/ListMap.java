@@ -43,6 +43,8 @@ import java.util.Set;
  * exceeds a handful.
  *
  * @author  Peter Wall
+ * @param   <K>         the key type
+ * @param   <V>         the value type
  */
 public class ListMap<K, V> implements Map<K, V>, Serializable {
 
@@ -292,6 +294,9 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
 
     /**
      * Inner class to represent a key-value pair in the {@code ListMap}.
+     *
+     * @param   <KK>    the key type
+     * @param   <VV>    the value type
      */
     public static class Entry<KK, VV> implements Map.Entry<KK, VV>, Serializable {
 
@@ -300,21 +305,36 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
         private KK key;
         private VV value;
 
+        /**
+         * Construct an {@code Entry} with the given key and value.
+         *
+         * @param   key     the key
+         * @param   value   the value
+         */
         public Entry(KK key, VV value) {
             this.key = key;
             this.value = value;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public KK getKey() {
             return key;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public VV getValue() {
             return value;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public VV setValue(VV value) {
             VV oldValue = this.value;
@@ -322,6 +342,9 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
             return oldValue;
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean equals(Object other) {
             if (other == this)
@@ -333,6 +356,9 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
                     Objects.equals(value, otherEntry.getValue());
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int hashCode() {
             return Objects.hash(key, value);
@@ -345,6 +371,9 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
      */
     private class EntryIterator extends BaseIterator<Map.Entry<K, V>> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Entry<K, V> next() {
             return nextEntry();
@@ -357,6 +386,9 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
      */
     private class KeyIterator extends BaseIterator<K> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public K next() {
             return nextEntry().getKey();
@@ -369,6 +401,9 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
      */
     private class ValueIterator extends BaseIterator<V> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public V next() {
             return nextEntry().getValue();
@@ -385,24 +420,31 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
 
         private int index;
 
+        /**
+         * Construct a {@code BaseIterator} starting at index 0.
+         */
         public BaseIterator() {
             index = 0;
         }
 
+        /**
+         * Get the next {@code Entry} from the list.  The different derived iterator types will
+         * return the entry itself, or the key or value.
+         *
+         * @return  the next {@code Entry}
+         */
         public Entry<K, V> nextEntry() {
             if (!hasNext())
                 throw new NoSuchElementException();
             return list.get(index++);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean hasNext() {
             return index < list.size();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
         }
 
     }
@@ -414,16 +456,25 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
      */
     private class EntrySet extends CollectionBase<Map.Entry<K, V>> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean contains(Object o) {
             return list.contains(o);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Iterator<Map.Entry<K, V>> iterator() {
             return new EntryIterator();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean containsAll(Collection<?> c) {
             for (Object o : c)
@@ -441,16 +492,25 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
      */
     private class KeySet extends CollectionBase<K> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean contains(Object o) {
             return containsKey(o);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Iterator<K> iterator() {
             return new KeyIterator();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean containsAll(Collection<?> c) {
             for (Object o : c)
@@ -468,16 +528,25 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
      */
     private class ValueCollection extends CollectionBase<V> {
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean contains(Object o) {
             return containsValue(o);
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Iterator<V> iterator() {
             return new ValueIterator();
         }
 
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public boolean containsAll(Collection<?> c) {
             for (Object o : c)
@@ -507,26 +576,59 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
             return list.size();
         }
 
+        /**
+         * Remove an object from the collection - not supported.
+         *
+         * @param   o   the object
+         * @return      (never returns normally)
+         * @throws      UnsupportedOperationException in all cases
+         */
         @Override
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * Add all elements from another collection - not supported.
+         *
+         * @param   c   the other collection
+         * @return      (never returns normally)
+         * @throws      UnsupportedOperationException in all cases
+         */
         @Override
         public boolean addAll(Collection<? extends T> c) {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * Remove all elements not matching those in another collection - not supported.
+         *
+         * @param   c   the other collection
+         * @return      (never returns normally)
+         * @throws      UnsupportedOperationException in all cases
+         */
         @Override
         public boolean retainAll(Collection<?> c) {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * Remove all elements matching those in another collection - not supported.
+         *
+         * @param   c   the other collection
+         * @return      (never returns normally)
+         * @throws      UnsupportedOperationException in all cases
+         */
         @Override
         public boolean removeAll(Collection<?> c) {
             throw new UnsupportedOperationException();
         }
 
+        /**
+         * Clear the collection - not supported.
+         *
+         * @throws      UnsupportedOperationException in all cases
+         */
         @Override
         public void clear() {
             throw new UnsupportedOperationException();
