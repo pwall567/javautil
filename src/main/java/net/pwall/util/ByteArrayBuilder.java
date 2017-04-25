@@ -82,6 +82,8 @@ public class ByteArrayBuilder {
 
     /**
      * Construct a {@code ByteArrayBuilder} from an existing byte array.
+     *
+     * @param   array   the byte array
      */
     public ByteArrayBuilder(byte[] array) {
         this(array != null ? array.length : 20);

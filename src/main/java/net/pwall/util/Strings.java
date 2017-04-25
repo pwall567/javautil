@@ -2,7 +2,7 @@
  * @(#) Strings.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014, 2015, 2016 Peter Wall
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -237,7 +237,7 @@ public class Strings {
      * </pre>
      *
      * @param   s           the string to be split
-     * @param   spaceTest   the {@link SpaceTest}
+     * @param   spaceTest   the space test function
      * @return  an array of tokens (possibly empty)
      * @throws  NullPointerException if the input string is {@code null}
      */
@@ -1708,7 +1708,7 @@ public class Strings {
      * supplied {@link IntPredicate} function.
      *
      * @param   s           the string to be trimmed
-     * @param   spaceTest   the {@link IntPredicate}
+     * @param   spaceTest   the space test function
      * @return  the trimmed string
      * @throws  NullPointerException if either argument is {@code null}
      */
@@ -1733,7 +1733,7 @@ public class Strings {
      * match a supplied {@link IntPredicate} function.
      *
      * @param   cs          the {@link CharSequence} to be trimmed
-     * @param   spaceTest   the {@link IntPredicate}
+     * @param   spaceTest   the space test function
      * @return  the trimmed {@link CharSequence}
      * @throws  NullPointerException if either argument is {@code null}
      */
@@ -1782,7 +1782,7 @@ public class Strings {
      * a supplied {@link IntPredicate} function.
      *
      * @param   s           the string to be trimmed
-     * @param   spaceTest   the {@link IntPredicate}
+     * @param   spaceTest   the space test function
      * @return the trimmed string
      * @throws NullPointerException if either argument is {@code null}
      */
