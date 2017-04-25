@@ -92,6 +92,8 @@ public class ByteArrayBuilder {
 
     /**
      * Construct a {@code ByteArrayBuilder} from another {@code ByteArrayBuilder}.
+     *
+     * @param   bab     the other {@code ByteArrayBuilder}
      */
     public ByteArrayBuilder(ByteArrayBuilder bab) {
         this(bab != null ? bab.length() : 20);
