@@ -1290,7 +1290,7 @@ public class Strings {
         int i = 0;
         for (;;) {
             try {
-                appendHex(sb, bytes[i]);
+                appendHex(sb, bytes[i++]);
             }
             catch (IOException e) {
                 // can't happen - StringBuilder.append() does not throw IOException

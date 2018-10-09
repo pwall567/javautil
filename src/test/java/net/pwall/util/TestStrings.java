@@ -281,6 +281,12 @@ public class TestStrings {
     }
 
     @Test
+    public void test_toHex_byteArray_c() {
+        byte[] array = { 0x01, 0x02, 0x40, 0x41 };
+        assertEquals("01.02.40.41", Strings.toHex(array, '.'));
+    }
+
+    @Test
     public void test_strip() {
         assertEquals("thequickbrownfoxetc.",
                 Strings.strip("the quick brown fox etc. ", Character::isWhitespace));
