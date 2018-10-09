@@ -280,4 +280,14 @@ public class TestStrings {
         assertEquals("000000000000000000000000FFFFFFFFFFFFFFFF", sb.toString());
     }
 
+    @Test
+    public void test_strip() {
+        assertEquals("thequickbrownfoxetc.",
+                Strings.strip("the quick brown fox etc. ", Character::isWhitespace));
+        assertEquals("ok", Strings.strip("   o   k   ", Character::isWhitespace));
+        assertEquals("\uD83D\uDE02\uD83D\uDE02",
+                Strings.stripUTF16("   \uD83D\uDE02   \uD83D\uDE02   ",
+                        Character::isWhitespace));
+    }
+
 }

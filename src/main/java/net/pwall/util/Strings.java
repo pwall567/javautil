@@ -2,7 +2,7 @@
  * @(#) Strings.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Peter Wall
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -1708,22 +1708,22 @@ public class Strings {
      * supplied {@link IntPredicate} function.
      *
      * @param   s           the string to be trimmed
-     * @param   spaceTest   the space test function
+     * @param   test        the test function
      * @return  the trimmed string
      * @throws  NullPointerException if either argument is {@code null}
      */
-    public static String trim(String s, IntPredicate spaceTest) {
-        Objects.requireNonNull(spaceTest);
+    public static String trim(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
         int start = 0;
         int end = s.length();
         for (;;) {
             if (start >= end)
                 return emptyString;
-            if (!spaceTest.test(s.charAt(start)))
+            if (!test.test(s.charAt(start)))
                 break;
             start++;
         }
-        while (spaceTest.test(s.charAt(end - 1)))
+        while (test.test(s.charAt(end - 1)))
             end--;
         return start == 0 && end == s.length() ? s : s.substring(start, end);
     }
@@ -1733,22 +1733,22 @@ public class Strings {
      * match a supplied {@link IntPredicate} function.
      *
      * @param   cs          the {@link CharSequence} to be trimmed
-     * @param   spaceTest   the space test function
+     * @param   test        the test function
      * @return  the trimmed {@link CharSequence}
      * @throws  NullPointerException if either argument is {@code null}
      */
-    public static CharSequence trim(CharSequence cs, IntPredicate spaceTest) {
-        Objects.requireNonNull(spaceTest);
+    public static CharSequence trim(CharSequence cs, IntPredicate test) {
+        Objects.requireNonNull(test);
         int start = 0;
         int end = cs.length();
         for (;;) {
             if (start >= end)
                 return emptyString;
-            if (!spaceTest.test(cs.charAt(start)))
+            if (!test.test(cs.charAt(start)))
                 break;
             start++;
         }
-        while (spaceTest.test(cs.charAt(end - 1)))
+        while (test.test(cs.charAt(end - 1)))
             end--;
         return start == 0 && end == cs.length() ? cs : new SubSequence(cs, start, end);
     }
@@ -1782,12 +1782,12 @@ public class Strings {
      * a supplied {@link IntPredicate} function.
      *
      * @param   s           the string to be trimmed
-     * @param   spaceTest   the space test function
+     * @param   test        the test function
      * @return the trimmed string
      * @throws NullPointerException if either argument is {@code null}
      */
-    public static String trimUTF16(String s, IntPredicate spaceTest) {
-        Objects.requireNonNull(spaceTest);
+    public static String trimUTF16(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
         int start = 0;
         int end = s.length();
         for (;;) {
@@ -1797,13 +1797,13 @@ public class Strings {
             if (Character.isHighSurrogate(hi) && start + 1 < end) {
                 char lo = s.charAt(start + 1);
                 if (Character.isLowSurrogate(lo)) {
-                    if (!spaceTest.test(Character.toCodePoint(hi, lo)))
+                    if (!test.test(Character.toCodePoint(hi, lo)))
                         break;
                     start += 2;
                     continue;
                 }
             }
-            if (!spaceTest.test(hi))
+            if (!test.test(hi))
                 break;
             start++;
         }
@@ -1812,17 +1812,116 @@ public class Strings {
             if (Character.isLowSurrogate(lo) && end - 1 > start) {
                 char hi = s.charAt(end - 2);
                 if (Character.isHighSurrogate(hi)) {
-                    if (!spaceTest.test(Character.toCodePoint(hi, lo)))
+                    if (!test.test(Character.toCodePoint(hi, lo)))
                         break;
                     end -= 2;
                     continue;
                 }
             }
-            if (!spaceTest.test(lo))
+            if (!test.test(lo))
                 break;
             end--;
         }
         return start == 0 && end == s.length() ? s : s.substring(start, end);
+    }
+
+    /**
+     * Strip characters from a string, where those characters match a supplied
+     * {@link IntPredicate} function.
+     *
+     * @param   s           the string to be stripped
+     * @param   test        the test function
+     * @return  the stripped string
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static String strip(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
+        for (int i = 0, n = s.length(); i < n; ) {
+            if (test.test(s.charAt(i++))) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(s, 0, i - 1);
+                while (i < n) {
+                    char ch = s.charAt(i++);
+                    if (!test.test(ch))
+                        sb.append(ch);
+                }
+                return sb.toString();
+            }
+        }
+        return s;
+    }
+
+    /**
+     * Strip characters from a {@link CharSequence}, where those characters match a supplied
+     * {@link IntPredicate} function.
+     *
+     * @param   cs          the {@link CharSequence} to be stripped
+     * @param   test        the test function
+     * @return  the stripped {@link CharSequence}
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static CharSequence strip(CharSequence cs, IntPredicate test) {
+        Objects.requireNonNull(test);
+        for (int i = 0, n = cs.length(); i < n; ) {
+            if (test.test(cs.charAt(i++))) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(cs, 0, i - 1);
+                while (i < n) {
+                    char ch = cs.charAt(i++);
+                    if (!test.test(ch))
+                        sb.append(ch);
+                }
+                return sb;
+            }
+        }
+        return cs;
+    }
+
+    /**
+     * Strip code points from a UTF16 string, where those code points match a supplied
+     * {@link IntPredicate} function.
+     *
+     * @param   s           the string to be stripped
+     * @param   test        the test function
+     * @return  the stripped string
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static String stripUTF16(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
+        for (int i = 0, n = s.length(); i < n; ) {
+            int k = i;
+            char hi = s.charAt(i++);
+            boolean stripped;
+            char lo;
+            if (Character.isHighSurrogate(hi) && i < n &&
+                    Character.isLowSurrogate(lo = s.charAt(i))) {
+                stripped = test.test(Character.toCodePoint(hi, lo));
+                i++;
+            }
+            else
+                stripped = test.test(hi);
+            if (stripped) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(s, 0, k);
+                while (i < n) {
+                    hi = s.charAt(i++);
+                    if (Character.isHighSurrogate(hi) && i < n &&
+                            Character.isLowSurrogate(lo = s.charAt(i))) {
+                        if (!test.test(Character.toCodePoint(hi, lo))) {
+                            sb.append(hi);
+                            sb.append(lo);
+                        }
+                        i++;
+                    }
+                    else {
+                        if (!test.test(hi))
+                            sb.append(hi);
+                    }
+                }
+                return sb.toString();
+            }
+        }
+        return s;
     }
 
     /**
