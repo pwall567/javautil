@@ -80,7 +80,31 @@ public class Base64 {
     }
 
     /**
-     * Encode a byte array into Base64.
+     * Get the encoded length of data encoded into Base64.
+     *
+     * @param   n       the source data length
+     * @return          the encoded data length
+     * @throws  NullPointerException if the data is null
+     */
+    public static int getEncodedLength(int n) {
+        return (n + 2) / 3 * 4;
+    }
+
+    /**
+     * Get the encoded length of data encoded into the URL variant of Base64.  This variant uses
+     * different characters for the last two positions in the encoding table, and (significantly
+     * for length calculation) it doesn't pad with equal signs.
+     *
+     * @param   n       the source data length
+     * @return          the encoded data length
+     * @throws  NullPointerException if the data is null
+     */
+    public static int getEncodedURLLength(int n) {
+        return (n * 4 + 2) / 3;
+    }
+
+    /**
+     * Encode a byte array into Base64, returning another byte array.
      *
      * @param   data    the source data
      * @return          the encoded data
@@ -90,7 +114,7 @@ public class Base64 {
         int n = data.length;
         if (n == 0)
             return emptyBytes;
-        byte[] bytes = new byte[(n + 2) / 3 * 4];
+        byte[] bytes = new byte[getEncodedLength(n)];
         int i = 0;
         int x = 0;
         int a, b, c;
@@ -124,9 +148,9 @@ public class Base64 {
     }
 
     /**
-     * Encode a byte array into the URL variant of Base64.  This variant uses different
-     * characters for the last two positions in the encoding table, and it doesn't pad with
-     * equal signs.
+     * Encode a byte array into the URL variant of Base64, returning another byte array.  The
+     * URL variant uses different characters for the last two positions in the encoding table,
+     * and it doesn't pad with equal signs.
      *
      * @param   data    the source data
      * @return          the encoded data
@@ -136,7 +160,7 @@ public class Base64 {
         int n = data.length;
         if (n == 0)
             return emptyBytes;
-        byte[] bytes = new byte[(n * 4 + 2) / 3];
+        byte[] bytes = new byte[getEncodedURLLength(n)];
         int i = 0;
         int x = 0;
         int a, b, c;
@@ -265,6 +289,44 @@ public class Base64 {
                         append((char)(base64URLBytes[(b << 2) & 0x3C]));
             }
         }
+    }
+
+    /**
+     * Encode a byte array into Base64, returning a string.
+     *
+     * @param   data    the source data
+     * @return          the encoded string
+     * @throws  NullPointerException if the data is null
+     */
+    public String encodeString(byte[] data) {
+        StringBuilder sb = new StringBuilder(getEncodedLength(data.length));
+        try {
+            appendEncoded(sb, data);
+        }
+        catch (IOException e) {
+            // can't happen - StringBuilder.append() does not throw IOException
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Encode a byte array into the URL variant of Base64, returning a string.  The URL variant
+     * uses different characters for the last two positions in the encoding table, and it
+     * doesn't pad with equal signs.
+     *
+     * @param   data    the source data
+     * @return          the encoded data
+     * @throws  NullPointerException if the data is null
+     */
+    public String encodeStringURL(byte[] data) {
+        StringBuilder sb = new StringBuilder(getEncodedURLLength(data.length));
+        try {
+            appendURLEncoded(sb, data);
+        }
+        catch (IOException e) {
+            // can't happen - StringBuilder.append() does not throw IOException
+        }
+        return sb.toString();
     }
 
     /**
