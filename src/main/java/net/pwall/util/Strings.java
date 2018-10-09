@@ -709,7 +709,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper} instance
      * @return  the string with characters mapped as required
      */
-    public static final String escape(String s, CharMapper mapper) {
+    public static String escape(String s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
             String mapped = mapper.map(s.charAt(i++));
             if (mapped != null) {
@@ -737,7 +737,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper} instance
      * @return  the sequence with characters mapped as required
      */
-    public static final CharSequence escape(CharSequence s, CharMapper mapper) {
+    public static CharSequence escape(CharSequence s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
             String mapped = mapper.map(s.charAt(i++));
             if (mapped != null) {
@@ -767,7 +767,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper}
      * @throws  IOException if thrown by the {@link Appendable}
      */
-    public static final void appendEscaped(Appendable a, CharSequence s, int index, int end,
+    public static void appendEscaped(Appendable a, CharSequence s, int index, int end,
             CharMapper mapper) throws IOException {
         while (index < end) {
             char ch = s.charAt(index++);
@@ -788,7 +788,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper}
      * @throws  IOException if thrown by the {@link Appendable}
      */
-    public static final void appendEscaped(Appendable a, CharSequence s, CharMapper mapper)
+    public static void appendEscaped(Appendable a, CharSequence s, CharMapper mapper)
             throws IOException {
         appendEscaped(a, s, 0, s.length(), mapper);
     }
@@ -803,7 +803,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper} instance
      * @return  the string with characters mapped as required
      */
-    public static final String escapeUTF16(String s, CharMapper mapper) {
+    public static String escapeUTF16(String s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
             int k = i;
             char ch1 = s.charAt(i++);
@@ -842,7 +842,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper} instance
      * @return  the sequence with characters mapped as required
      */
-    public static final CharSequence escapeUTF16(CharSequence s, CharMapper mapper) {
+    public static CharSequence escapeUTF16(CharSequence s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
             int k = i;
             char ch1 = s.charAt(i++);
@@ -883,8 +883,8 @@ public class Strings {
      * @param   mapper  the {@link CharMapper}
      * @throws  IOException if thrown by the {@link Appendable}
      */
-    public static final void appendEscapedUTF16(Appendable a, CharSequence s, int index,
-            int end, CharMapper mapper) throws IOException {
+    public static void appendEscapedUTF16(Appendable a, CharSequence s, int index, int end,
+            CharMapper mapper) throws IOException {
         String mapped;
         while (index < end) {
             char ch1 = s.charAt(index++);
@@ -918,7 +918,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper}
      * @throws  IOException if thrown by the {@link Appendable}
      */
-    public static final void appendEscapedUTF16(Appendable a, CharSequence s, CharMapper mapper)
+    public static void appendEscapedUTF16(Appendable a, CharSequence s, CharMapper mapper)
             throws IOException {
         appendEscapedUTF16(a, s, 0, s.length(), mapper);
     }
