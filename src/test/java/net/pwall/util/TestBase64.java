@@ -1,15 +1,35 @@
 /*
  * @(#) TestBase64.java
+ *
+ * javautil Java Utility Library
+ * Copyright (c) 2018, 2019 Peter Wall
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 package net.pwall.util;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.util.Random;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test Base64 encode/decode.
@@ -239,46 +259,26 @@ public class TestBase64 {
         }
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testNPE1() {
-        Base64.encode(null);
+    @Test
+    public void testNPE() {
+        assertThrows(NullPointerException.class, () -> Base64.encode(null));
+        assertThrows(NullPointerException.class, () -> Base64.encodeURL(null));
+        assertThrows(NullPointerException.class, () -> Base64.decode((byte[])null));
+        assertThrows(NullPointerException.class, () -> Base64.decode((String)null));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testNPE2() {
-        Base64.encodeURL(null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNPE3() {
-        Base64.decode((byte[])null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNPE4() {
-        Base64.decode((String)null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegal1() {
-        byte[] b = new byte[] { (byte)'[', (byte)']' };
-        Base64.decode(b);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegal2() {
-        byte[] b = new byte[] { (byte)'A' };
-        Base64.decode(b);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegal3() {
-        Base64.decode("[]");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testIllegal4() {
-        Base64.decode("A");
+    @Test
+    public void testIllegal() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            byte[] b = new byte[] { (byte)'[', (byte)']' };
+            Base64.decode(b);
+        });
+        assertThrows(IllegalArgumentException.class, () -> {
+            byte[] b = new byte[] { (byte)'A' };
+            Base64.decode(b);
+        });
+        assertThrows(IllegalArgumentException.class, () -> Base64.decode("[]"));
+        assertThrows(IllegalArgumentException.class, () -> Base64.decode("A"));
     }
 
     @Test

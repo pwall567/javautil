@@ -25,14 +25,14 @@
 
 package net.pwall.util;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test class for {@link ParseText}.
@@ -44,7 +44,7 @@ public class TestParseText {
     private int smile = 0x1F609;
 
     @Test
-    public void testContructor() {
+    public void testConstructor() {
         ParseText pt = new ParseText(str1);
         assertEquals(str1, pt.getText());
         assertEquals(7, pt.length());
@@ -58,10 +58,9 @@ public class TestParseText {
         assertEquals(3, pt.getStart());
     }
 
-    @SuppressWarnings("unused")
-    @Test(expected=NullPointerException.class)
-    public void testContructorNull() {
-        new ParseText(null);
+    @Test
+    public void testConstructorNull() {
+        assertThrows(NullPointerException.class, () -> new ParseText(null));
     }
 
     @Test
@@ -156,16 +155,20 @@ public class TestParseText {
         assertEquals(smile, pt.getCodePoint());
     }
 
-    @Test(expected=StringIndexOutOfBoundsException.class)
+    @Test
     public void testSetIndexError() {
-        ParseText pt = new ParseText(str1);
-        pt.setIndex(8);
+        assertThrows(StringIndexOutOfBoundsException.class, () -> {
+            ParseText pt = new ParseText(str1);
+            pt.setIndex(8);
+        });
     }
 
-    @Test(expected=StringIndexOutOfBoundsException.class)
+    @Test
     public void testSetStartError() {
-        ParseText pt = new ParseText(str1);
-        pt.setStart(1);
+        assertThrows(StringIndexOutOfBoundsException.class, () -> {
+            ParseText pt = new ParseText(str1);
+            pt.setStart(1);
+        });
     }
 
     @Test
@@ -182,28 +185,24 @@ public class TestParseText {
         assertEquals(2147483645, pt.getInt(0, 10));
     }
 
-    @Test(expected=NumberFormatException.class)
-    public void testGetIntError1() {
-        ParseText pt = new ParseText("2147483648");
-        pt.getInt(0, 10);
-    }
-
-    @Test(expected=NumberFormatException.class)
-    public void testGetIntError2() {
-        ParseText pt = new ParseText("2147483650");
-        pt.getInt(0, 10);
-    }
-
-    @Test(expected=NumberFormatException.class)
-    public void testGetIntError3() {
-        ParseText pt = new ParseText("  47483650");
-        pt.getInt(0, 10);
-    }
-
-    @Test(expected=NumberFormatException.class)
-    public void testGetIntError4() {
-        ParseText pt = new ParseText(str1);
-        pt.getInt(0, 0);
+    @Test
+    public void testGetIntError() {
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText("2147483648");
+            pt.getInt(0, 10);
+        });
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText("2147483650");
+            pt.getInt(0, 10);
+        });
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText("  47483650");
+            pt.getInt(0, 10);
+        });
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText(str1);
+            pt.getInt(0, 0);
+        });
     }
 
     @Test
@@ -235,10 +234,12 @@ public class TestParseText {
         assertEquals(0x7FFFFFF0, pt.getHexInt(0, 8));
     }
 
-    @Test(expected=NumberFormatException.class)
-    public void testGetHexIntError1() {
-        ParseText pt = new ParseText("80000000");
-        pt.getHexInt(0, 8);
+    @Test
+    public void testGetHexIntError() {
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText("80000000");
+            pt.getHexInt(0, 8);
+        });
     }
 
     @Test
@@ -273,28 +274,24 @@ public class TestParseText {
         assertEquals(9223372036854775805L, pt.getLong(0, 19));
     }
 
-    @Test(expected=NumberFormatException.class)
-    public void testGetLongError1() {
-        ParseText pt = new ParseText("9223372036854775808");
-        pt.getLong(0, 19);
-    }
-
-    @Test(expected=NumberFormatException.class)
-    public void testGetLongError2() {
-        ParseText pt = new ParseText("9223372036854775810");
-        pt.getLong(0, 19);
-    }
-
-    @Test(expected=NumberFormatException.class)
-    public void testGetLongError3() {
-        ParseText pt = new ParseText("+223372036854775807");
-        pt.getLong(0, 19);
-    }
-
-    @Test(expected=NumberFormatException.class)
-    public void testGetLongError4() {
-        ParseText pt = new ParseText(str1);
-        pt.getLong(0, 0);
+    @Test
+    public void testGetLongError() {
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText("9223372036854775808");
+            pt.getLong(0, 19);
+        });
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText("9223372036854775810");
+            pt.getLong(0, 19);
+        });
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText("+223372036854775807");
+            pt.getLong(0, 19);
+        });
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText(str1);
+            pt.getLong(0, 0);
+        });
     }
 
     @Test
@@ -314,10 +311,12 @@ public class TestParseText {
         assertEquals(0x7FFFFFFFFFFFFFF0L, pt.getHexLong(0, 16));
     }
 
-    @Test(expected=NumberFormatException.class)
-    public void testGetHexLongError1() {
-        ParseText pt = new ParseText("8000000000000000");
-        pt.getHexLong(0, 16);
+    @Test
+    public void testGetHexLongError() {
+        assertThrows(NumberFormatException.class, () -> {
+            ParseText pt = new ParseText("8000000000000000");
+            pt.getHexLong(0, 16);
+        });
     }
 
     @Test
@@ -456,11 +455,13 @@ public class TestParseText {
         assertEquals(1, pt.getStart());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testMatchAnyOf4() {
-        char[] array1 = {};
-        ParseText pt = new ParseText(str1);
-        assertFalse(pt.matchAnyOf(array1));
+        assertThrows(IllegalArgumentException.class, () -> {
+            char[] array1 = {};
+            ParseText pt = new ParseText(str1);
+            assertFalse(pt.matchAnyOf(array1));
+        });
     }
 
     @Test
@@ -547,10 +548,10 @@ public class TestParseText {
         assertEquals(2, pt.getStart());
     }
 
-    private <T> List<T> createList(@SuppressWarnings("unchecked") T ... items) {
+    @SafeVarargs
+    private final <T> List<T> createList(@SuppressWarnings("unchecked") T... items) {
         List<T> result = new ArrayList<>();
-        for (T item : items)
-            result.add(item);
+        Collections.addAll(result, items);
         return result;
     }
 
@@ -753,10 +754,12 @@ public class TestParseText {
         assertTrue(pt.isExhausted());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testSkipToAnyOf3() {
-        ParseText pt = new ParseText(str1);
-        pt.skipToAnyOf();
+        assertThrows(IllegalArgumentException.class, () -> {
+            ParseText pt = new ParseText(str1);
+            pt.skipToAnyOf();
+        });
     }
 
     @Test
@@ -778,10 +781,12 @@ public class TestParseText {
         assertTrue(pt.isExhausted());
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void testSkipToAnyOf5() {
-        ParseText pt = new ParseText(str1);
-        pt.skipToAnyOf("");
+        assertThrows(IllegalArgumentException.class, () -> {
+            ParseText pt = new ParseText(str1);
+            pt.skipToAnyOf("");
+        });
     }
 
     @Test

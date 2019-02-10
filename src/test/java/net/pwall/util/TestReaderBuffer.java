@@ -25,11 +25,10 @@
 
 package net.pwall.util;
 
-import static org.junit.Assert.*;
-
 import java.io.StringReader;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test class for {@link ReaderBuffer}.
@@ -38,12 +37,12 @@ import org.junit.Test;
  */
 public class TestReaderBuffer {
 
-    private String exampleString = "The quick brown fox jumps over the lazy dog.\n" +
+    private static final String exampleString = "The quick brown fox jumps over the lazy dog.\n" +
             "Now is the time for all good men to come to the aid of the party.\n" +
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
             "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n";
-    private String emptyString = "";
-    private String eightChars = "abcdefgh";
+    private static final String emptyString = "";
+    private static final String eightChars = "abcdefgh";
 
     @Test
     public void test() throws Exception {
