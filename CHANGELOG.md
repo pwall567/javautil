@@ -3,6 +3,10 @@ Added this change log after project was already under way.  Early changes are no
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [Unreleased]
+### Changed
+- Switched to JUnit 5
+
 ## [2.0] - 2017-04-25
 ### Changed
 - Multiple classes modified for Java 8
