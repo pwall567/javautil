@@ -1,10 +1,38 @@
+/*
+ * @(#) TestStrings.java
+ *
+ * javautil Java Utility Library
+ * Copyright (c) 2015 Peter Wall
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package net.pwall.util;
 
-import static org.junit.Assert.*;
-
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestStrings {
 
@@ -38,6 +66,87 @@ public class TestStrings {
             byte[] bb = Strings.toUTF8(str1);
             assertEquals(str1, Strings.fromUTF8(bb));
         }
+    }
+
+    @Test
+    public void test_fromUTF8_iterator_1() {
+        for (int i = 0; i < 0xD7FF; i++) {
+            StringBuilder sb = new StringBuilder();
+            try {
+                Strings.appendUTF16(sb, i);
+            }
+            catch (IOException e) {
+                // can't happen
+            }
+            String str1 = sb.toString();
+            byte[] bb = Strings.toUTF8(str1);
+            Iterator<Byte> bi = new Iterator<Byte>() {
+                private int i = 0;
+                @Override
+                public boolean hasNext() {
+                    return i < bb.length;
+                }
+                @Override
+                public Byte next() {
+                    return bb[i++];
+                }
+            };
+            assertEquals(str1, Strings.fromUTF8(bi));
+        }
+    }
+
+    @Test
+    public void test_fromUTF8_bytebuffer_1() {
+        for (int i = 0; i < 0xD7FF; i++) {
+            StringBuilder sb = new StringBuilder();
+            try {
+                Strings.appendUTF16(sb, i);
+            }
+            catch (IOException e) {
+                // can't happen
+            }
+            String str1 = sb.toString();
+            byte[] bb = Strings.toUTF8(str1);
+            ByteBuffer buf = ByteBuffer.allocate(bb.length);
+            buf.put(bb);
+            buf.flip();
+            assertEquals(str1, Strings.fromUTF8(buf));
+        }
+    }
+
+    @Test
+    public void test_fromUTF8_bytebuffers_1() {
+        StringBuilder sb = new StringBuilder(30000);
+        for (int i = 0; i < 8192; i++) {
+            try {
+                Strings.appendUTF16(sb, i);
+            }
+            catch (IOException e) {
+                // can't happen
+            }
+        }
+        String str1 = sb.toString();
+        byte[] bb = Strings.toUTF8(str1);
+        List<ByteBuffer> bufList = new ArrayList<>();
+        int offset = 0;
+        int len = 1024;
+        while (offset < bb.length) {
+            if (bb.length - offset <= len) {
+                ByteBuffer buf = ByteBuffer.allocate(bb.length - offset);
+                buf.put(bb, offset, bb.length - offset);
+                buf.flip();
+                bufList.add(buf);
+                break;
+            }
+            ByteBuffer buf = ByteBuffer.allocate(len);
+            buf.put(bb, offset, len);
+            buf.flip();
+            bufList.add(buf);
+            offset += len;
+        }
+        ByteBuffer[] bufArray = new ByteBuffer[bufList.size()];
+        System.out.println("Number of ByteBuffer = " + bufArray.length);
+        assertEquals(str1, Strings.fromUTF8(bufList.toArray(bufArray)));
     }
 
     @Test
@@ -278,6 +387,22 @@ public class TestStrings {
         m = -1;
         Strings.appendHex(sb, m, 40);
         assertEquals("000000000000000000000000FFFFFFFFFFFFFFFF", sb.toString());
+    }
+
+    @Test
+    public void test_toHex_byteArray_c() {
+        byte[] array = { 0x01, 0x02, 0x40, 0x41 };
+        assertEquals("01.02.40.41", Strings.toHex(array, '.'));
+    }
+
+    @Test
+    public void test_strip() {
+        assertEquals("thequickbrownfoxetc.",
+                Strings.strip("the quick brown fox etc. ", Character::isWhitespace));
+        assertEquals("ok", Strings.strip("   o   k   ", Character::isWhitespace));
+        assertEquals("\uD83D\uDE02\uD83D\uDE02",
+                Strings.stripUTF16("   \uD83D\uDE02   \uD83D\uDE02   ",
+                        Character::isWhitespace));
     }
 
 }

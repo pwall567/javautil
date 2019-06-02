@@ -2,7 +2,7 @@
  * @(#) Strings.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014, 2015, 2016, 2017 Peter Wall
+ * Copyright (c) 2013, 2014, 2015, 2016, 2017, 2018 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@
 package net.pwall.util;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Objects;
@@ -709,7 +710,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper} instance
      * @return  the string with characters mapped as required
      */
-    public static final String escape(String s, CharMapper mapper) {
+    public static String escape(String s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
             String mapped = mapper.map(s.charAt(i++));
             if (mapped != null) {
@@ -737,7 +738,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper} instance
      * @return  the sequence with characters mapped as required
      */
-    public static final CharSequence escape(CharSequence s, CharMapper mapper) {
+    public static CharSequence escape(CharSequence s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
             String mapped = mapper.map(s.charAt(i++));
             if (mapped != null) {
@@ -767,7 +768,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper}
      * @throws  IOException if thrown by the {@link Appendable}
      */
-    public static final void appendEscaped(Appendable a, CharSequence s, int index, int end,
+    public static void appendEscaped(Appendable a, CharSequence s, int index, int end,
             CharMapper mapper) throws IOException {
         while (index < end) {
             char ch = s.charAt(index++);
@@ -788,7 +789,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper}
      * @throws  IOException if thrown by the {@link Appendable}
      */
-    public static final void appendEscaped(Appendable a, CharSequence s, CharMapper mapper)
+    public static void appendEscaped(Appendable a, CharSequence s, CharMapper mapper)
             throws IOException {
         appendEscaped(a, s, 0, s.length(), mapper);
     }
@@ -803,7 +804,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper} instance
      * @return  the string with characters mapped as required
      */
-    public static final String escapeUTF16(String s, CharMapper mapper) {
+    public static String escapeUTF16(String s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
             int k = i;
             char ch1 = s.charAt(i++);
@@ -842,7 +843,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper} instance
      * @return  the sequence with characters mapped as required
      */
-    public static final CharSequence escapeUTF16(CharSequence s, CharMapper mapper) {
+    public static CharSequence escapeUTF16(CharSequence s, CharMapper mapper) {
         for (int i = 0, n = s.length(); i < n; ) {
             int k = i;
             char ch1 = s.charAt(i++);
@@ -883,8 +884,8 @@ public class Strings {
      * @param   mapper  the {@link CharMapper}
      * @throws  IOException if thrown by the {@link Appendable}
      */
-    public static final void appendEscapedUTF16(Appendable a, CharSequence s, int index,
-            int end, CharMapper mapper) throws IOException {
+    public static void appendEscapedUTF16(Appendable a, CharSequence s, int index, int end,
+            CharMapper mapper) throws IOException {
         String mapped;
         while (index < end) {
             char ch1 = s.charAt(index++);
@@ -918,7 +919,7 @@ public class Strings {
      * @param   mapper  the {@link CharMapper}
      * @throws  IOException if thrown by the {@link Appendable}
      */
-    public static final void appendEscapedUTF16(Appendable a, CharSequence s, CharMapper mapper)
+    public static void appendEscapedUTF16(Appendable a, CharSequence s, CharMapper mapper)
             throws IOException {
         appendEscapedUTF16(a, s, 0, s.length(), mapper);
     }
@@ -1121,6 +1122,123 @@ public class Strings {
     }
 
     /**
+     * Convert a sequence of bytes in a {@link ByteBuffer} from UTF-8 encoding to a UTF-16 string.
+     *
+     * @param   byteBuffer  the {@link ByteBuffer}
+     * @return              the decoded string
+     * @throws              IllegalArgumentException if the byte array is {@code null}, if the start
+     *                      or end index is invalid, or if the byte array contains an invalid UTF-8
+     *                      sequence
+     */
+    public static String fromUTF8(ByteBuffer byteBuffer) {
+        if (byteBuffer == null)
+            throw new IllegalArgumentException("ByteBuffer must not be null");
+        return fromUTF8(new Iterator<Byte>() {
+            @Override
+            public boolean hasNext() {
+                return byteBuffer.hasRemaining();
+            }
+            @Override
+            public Byte next() {
+                return byteBuffer.get();
+            }
+        });
+    }
+
+    /**
+     * Convert a sequence of bytes in an array of {@link ByteBuffer}s from UTF-8 encoding to a UTF-16 string.
+     *
+     * @param   byteBuffers the {@link ByteBuffer} array
+     * @return              the decoded string
+     * @throws              IllegalArgumentException if the byte array is {@code null}, if the start
+     *                      or end index is invalid, or if the byte array contains an invalid UTF-8
+     *                      sequence
+     */
+    public static String fromUTF8(ByteBuffer[] byteBuffers) {
+        if (byteBuffers == null)
+            throw new IllegalArgumentException("ByteBuffer array must not be null");
+        return fromUTF8(new Iterator<Byte>() {
+            int i = 0;
+            @Override
+            public boolean hasNext() {
+                while (i < byteBuffers.length) {
+                    if (byteBuffers[i].hasRemaining())
+                        return true;
+                    i++;
+                }
+                return false;
+            }
+            @Override
+            public Byte next() {
+                return byteBuffers[i].get();
+            }
+        });
+    }
+
+    /**
+     * Convert a sequence of bytes described by an {@link Iterator} from UTF-8 encoding to a UTF-16 string.
+     *
+     * @param   byteIterator    an {@link Iterator} over a sequence of bytes
+     * @return                  the decoded string
+     * @throws                  IllegalArgumentException if the byte array is {@code null}, if the start
+     *                          or end index is invalid, or if the byte array contains an invalid UTF-8
+     *                          sequence
+     */
+    public static String fromUTF8(Iterator<Byte> byteIterator) {
+        if (byteIterator == null)
+            throw new IllegalArgumentException("Byte iterator must not be null");
+        StringBuilder sb = new StringBuilder();
+        while (byteIterator.hasNext()) {
+            int b = byteIterator.next();
+            if ((b & 0x80) == 0)
+                sb.append((char)b);
+            else if ((b & 0x40) == 0)
+                throw new IllegalArgumentException("Illegal character in UTF-8 bytes");
+            else if ((b & 0x20) == 0) {
+                int codePoint = b & 0x1F;
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                sb.append((char)codePoint);
+            }
+            else if ((b & 0x10) == 0) {
+                int codePoint = b & 0x0F;
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                sb.append((char)codePoint);
+            }
+            else {
+                int codePoint = b & 0x07;
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                try {
+                    appendUTF16(sb, codePoint);
+                }
+                catch (IOException ioe) {
+                    // can't happen - StringBuilder.append() does not throw IOException
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Accumulate codepoint (UTF-8 decoding).
+     *
+     * @param   codePoint       the codepoint so far
+     * @param   byteIterator    the {@link Iterator}
+     * @return                  the updated codepoint
+     * @throws  IllegalArgumentException if the bytes are invalid
+     */
+    private static int addToCodePoint(int codePoint, Iterator<Byte> byteIterator) {
+        if (!byteIterator.hasNext())
+            throw new IllegalArgumentException("Incomplete sequence in UTF-8 bytes");
+        int b = byteIterator.next();
+        if ((b & 0xC0) != 0x80)
+            throw new IllegalArgumentException("Illegal character in UTF-8 bytes");
+        return (codePoint << 6) | (b & 0x3F);
+    }
+
+    /**
      * Convert a portion of a byte array from UTF-8 encoding to a UTF-16 string.
      *
      * @param   bytes   the byte array
@@ -1290,7 +1408,7 @@ public class Strings {
         int i = 0;
         for (;;) {
             try {
-                appendHex(sb, bytes[i]);
+                appendHex(sb, bytes[i++]);
             }
             catch (IOException e) {
                 // can't happen - StringBuilder.append() does not throw IOException
@@ -1708,22 +1826,22 @@ public class Strings {
      * supplied {@link IntPredicate} function.
      *
      * @param   s           the string to be trimmed
-     * @param   spaceTest   the space test function
+     * @param   test        the test function
      * @return  the trimmed string
      * @throws  NullPointerException if either argument is {@code null}
      */
-    public static String trim(String s, IntPredicate spaceTest) {
-        Objects.requireNonNull(spaceTest);
+    public static String trim(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
         int start = 0;
         int end = s.length();
         for (;;) {
             if (start >= end)
                 return emptyString;
-            if (!spaceTest.test(s.charAt(start)))
+            if (!test.test(s.charAt(start)))
                 break;
             start++;
         }
-        while (spaceTest.test(s.charAt(end - 1)))
+        while (test.test(s.charAt(end - 1)))
             end--;
         return start == 0 && end == s.length() ? s : s.substring(start, end);
     }
@@ -1733,22 +1851,22 @@ public class Strings {
      * match a supplied {@link IntPredicate} function.
      *
      * @param   cs          the {@link CharSequence} to be trimmed
-     * @param   spaceTest   the space test function
+     * @param   test        the test function
      * @return  the trimmed {@link CharSequence}
      * @throws  NullPointerException if either argument is {@code null}
      */
-    public static CharSequence trim(CharSequence cs, IntPredicate spaceTest) {
-        Objects.requireNonNull(spaceTest);
+    public static CharSequence trim(CharSequence cs, IntPredicate test) {
+        Objects.requireNonNull(test);
         int start = 0;
         int end = cs.length();
         for (;;) {
             if (start >= end)
                 return emptyString;
-            if (!spaceTest.test(cs.charAt(start)))
+            if (!test.test(cs.charAt(start)))
                 break;
             start++;
         }
-        while (spaceTest.test(cs.charAt(end - 1)))
+        while (test.test(cs.charAt(end - 1)))
             end--;
         return start == 0 && end == cs.length() ? cs : new SubSequence(cs, start, end);
     }
@@ -1782,12 +1900,12 @@ public class Strings {
      * a supplied {@link IntPredicate} function.
      *
      * @param   s           the string to be trimmed
-     * @param   spaceTest   the space test function
+     * @param   test        the test function
      * @return the trimmed string
      * @throws NullPointerException if either argument is {@code null}
      */
-    public static String trimUTF16(String s, IntPredicate spaceTest) {
-        Objects.requireNonNull(spaceTest);
+    public static String trimUTF16(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
         int start = 0;
         int end = s.length();
         for (;;) {
@@ -1797,13 +1915,13 @@ public class Strings {
             if (Character.isHighSurrogate(hi) && start + 1 < end) {
                 char lo = s.charAt(start + 1);
                 if (Character.isLowSurrogate(lo)) {
-                    if (!spaceTest.test(Character.toCodePoint(hi, lo)))
+                    if (!test.test(Character.toCodePoint(hi, lo)))
                         break;
                     start += 2;
                     continue;
                 }
             }
-            if (!spaceTest.test(hi))
+            if (!test.test(hi))
                 break;
             start++;
         }
@@ -1812,17 +1930,116 @@ public class Strings {
             if (Character.isLowSurrogate(lo) && end - 1 > start) {
                 char hi = s.charAt(end - 2);
                 if (Character.isHighSurrogate(hi)) {
-                    if (!spaceTest.test(Character.toCodePoint(hi, lo)))
+                    if (!test.test(Character.toCodePoint(hi, lo)))
                         break;
                     end -= 2;
                     continue;
                 }
             }
-            if (!spaceTest.test(lo))
+            if (!test.test(lo))
                 break;
             end--;
         }
         return start == 0 && end == s.length() ? s : s.substring(start, end);
+    }
+
+    /**
+     * Strip characters from a string, where those characters match a supplied
+     * {@link IntPredicate} function.
+     *
+     * @param   s           the string to be stripped
+     * @param   test        the test function
+     * @return  the stripped string
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static String strip(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
+        for (int i = 0, n = s.length(); i < n; ) {
+            if (test.test(s.charAt(i++))) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(s, 0, i - 1);
+                while (i < n) {
+                    char ch = s.charAt(i++);
+                    if (!test.test(ch))
+                        sb.append(ch);
+                }
+                return sb.toString();
+            }
+        }
+        return s;
+    }
+
+    /**
+     * Strip characters from a {@link CharSequence}, where those characters match a supplied
+     * {@link IntPredicate} function.
+     *
+     * @param   cs          the {@link CharSequence} to be stripped
+     * @param   test        the test function
+     * @return  the stripped {@link CharSequence}
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static CharSequence strip(CharSequence cs, IntPredicate test) {
+        Objects.requireNonNull(test);
+        for (int i = 0, n = cs.length(); i < n; ) {
+            if (test.test(cs.charAt(i++))) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(cs, 0, i - 1);
+                while (i < n) {
+                    char ch = cs.charAt(i++);
+                    if (!test.test(ch))
+                        sb.append(ch);
+                }
+                return sb;
+            }
+        }
+        return cs;
+    }
+
+    /**
+     * Strip code points from a UTF16 string, where those code points match a supplied
+     * {@link IntPredicate} function.
+     *
+     * @param   s           the string to be stripped
+     * @param   test        the test function
+     * @return  the stripped string
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static String stripUTF16(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
+        for (int i = 0, n = s.length(); i < n; ) {
+            int k = i;
+            char hi = s.charAt(i++);
+            boolean stripped;
+            char lo;
+            if (Character.isHighSurrogate(hi) && i < n &&
+                    Character.isLowSurrogate(lo = s.charAt(i))) {
+                stripped = test.test(Character.toCodePoint(hi, lo));
+                i++;
+            }
+            else
+                stripped = test.test(hi);
+            if (stripped) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(s, 0, k);
+                while (i < n) {
+                    hi = s.charAt(i++);
+                    if (Character.isHighSurrogate(hi) && i < n &&
+                            Character.isLowSurrogate(lo = s.charAt(i))) {
+                        if (!test.test(Character.toCodePoint(hi, lo))) {
+                            sb.append(hi);
+                            sb.append(lo);
+                        }
+                        i++;
+                    }
+                    else {
+                        if (!test.test(hi))
+                            sb.append(hi);
+                    }
+                }
+                return sb.toString();
+            }
+        }
+        return s;
     }
 
     /**
