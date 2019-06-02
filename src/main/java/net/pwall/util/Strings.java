@@ -26,6 +26,7 @@
 package net.pwall.util;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Objects;
@@ -1118,6 +1119,123 @@ public class Strings {
             bab.append(((codepoint >> 6) & 0x3F) | 0x80);
             bab.append((codepoint & 0x3F) | 0x80);
         }
+    }
+
+    /**
+     * Convert a sequence of bytes in a {@link ByteBuffer} from UTF-8 encoding to a UTF-16 string.
+     *
+     * @param   byteBuffer  the {@link ByteBuffer}
+     * @return              the decoded string
+     * @throws              IllegalArgumentException if the byte array is {@code null}, if the start
+     *                      or end index is invalid, or if the byte array contains an invalid UTF-8
+     *                      sequence
+     */
+    public static String fromUTF8(ByteBuffer byteBuffer) {
+        if (byteBuffer == null)
+            throw new IllegalArgumentException("ByteBuffer must not be null");
+        return fromUTF8(new Iterator<Byte>() {
+            @Override
+            public boolean hasNext() {
+                return byteBuffer.hasRemaining();
+            }
+            @Override
+            public Byte next() {
+                return byteBuffer.get();
+            }
+        });
+    }
+
+    /**
+     * Convert a sequence of bytes in an array of {@link ByteBuffer}s from UTF-8 encoding to a UTF-16 string.
+     *
+     * @param   byteBuffers the {@link ByteBuffer} array
+     * @return              the decoded string
+     * @throws              IllegalArgumentException if the byte array is {@code null}, if the start
+     *                      or end index is invalid, or if the byte array contains an invalid UTF-8
+     *                      sequence
+     */
+    public static String fromUTF8(ByteBuffer[] byteBuffers) {
+        if (byteBuffers == null)
+            throw new IllegalArgumentException("ByteBuffer array must not be null");
+        return fromUTF8(new Iterator<Byte>() {
+            int i = 0;
+            @Override
+            public boolean hasNext() {
+                while (i < byteBuffers.length) {
+                    if (byteBuffers[i].hasRemaining())
+                        return true;
+                    i++;
+                }
+                return false;
+            }
+            @Override
+            public Byte next() {
+                return byteBuffers[i].get();
+            }
+        });
+    }
+
+    /**
+     * Convert a sequence of bytes described by an {@link Iterator} from UTF-8 encoding to a UTF-16 string.
+     *
+     * @param   byteIterator    an {@link Iterator} over a sequence of bytes
+     * @return                  the decoded string
+     * @throws                  IllegalArgumentException if the byte array is {@code null}, if the start
+     *                          or end index is invalid, or if the byte array contains an invalid UTF-8
+     *                          sequence
+     */
+    public static String fromUTF8(Iterator<Byte> byteIterator) {
+        if (byteIterator == null)
+            throw new IllegalArgumentException("Byte iterator must not be null");
+        StringBuilder sb = new StringBuilder();
+        while (byteIterator.hasNext()) {
+            int b = byteIterator.next();
+            if ((b & 0x80) == 0)
+                sb.append((char)b);
+            else if ((b & 0x40) == 0)
+                throw new IllegalArgumentException("Illegal character in UTF-8 bytes");
+            else if ((b & 0x20) == 0) {
+                int codePoint = b & 0x1F;
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                sb.append((char)codePoint);
+            }
+            else if ((b & 0x10) == 0) {
+                int codePoint = b & 0x0F;
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                sb.append((char)codePoint);
+            }
+            else {
+                int codePoint = b & 0x07;
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                codePoint = addToCodePoint(codePoint, byteIterator);
+                try {
+                    appendUTF16(sb, codePoint);
+                }
+                catch (IOException ioe) {
+                    // can't happen - StringBuilder.append() does not throw IOException
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Accumulate codepoint (UTF-8 decoding).
+     *
+     * @param   codePoint       the codepoint so far
+     * @param   byteIterator    the {@link Iterator}
+     * @return                  the updated codepoint
+     * @throws  IllegalArgumentException if the bytes are invalid
+     */
+    private static int addToCodePoint(int codePoint, Iterator<Byte> byteIterator) {
+        if (!byteIterator.hasNext())
+            throw new IllegalArgumentException("Incomplete sequence in UTF-8 bytes");
+        int b = byteIterator.next();
+        if ((b & 0xC0) != 0x80)
+            throw new IllegalArgumentException("Illegal character in UTF-8 bytes");
+        return (codePoint << 6) | (b & 0x3F);
     }
 
     /**

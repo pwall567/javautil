@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/).
 ## [Unreleased]
 ### Changed
 - Switched to JUnit 5
+- Added new `fromUTF8` functions to `Strings` taking `Iterator` and `ByteBuffer`
 
 ## [2.0] - 2017-04-25
 ### Changed

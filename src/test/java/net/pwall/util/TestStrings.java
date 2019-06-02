@@ -26,6 +26,10 @@
 package net.pwall.util;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -62,6 +66,87 @@ public class TestStrings {
             byte[] bb = Strings.toUTF8(str1);
             assertEquals(str1, Strings.fromUTF8(bb));
         }
+    }
+
+    @Test
+    public void test_fromUTF8_iterator_1() {
+        for (int i = 0; i < 0xD7FF; i++) {
+            StringBuilder sb = new StringBuilder();
+            try {
+                Strings.appendUTF16(sb, i);
+            }
+            catch (IOException e) {
+                // can't happen
+            }
+            String str1 = sb.toString();
+            byte[] bb = Strings.toUTF8(str1);
+            Iterator<Byte> bi = new Iterator<Byte>() {
+                private int i = 0;
+                @Override
+                public boolean hasNext() {
+                    return i < bb.length;
+                }
+                @Override
+                public Byte next() {
+                    return bb[i++];
+                }
+            };
+            assertEquals(str1, Strings.fromUTF8(bi));
+        }
+    }
+
+    @Test
+    public void test_fromUTF8_bytebuffer_1() {
+        for (int i = 0; i < 0xD7FF; i++) {
+            StringBuilder sb = new StringBuilder();
+            try {
+                Strings.appendUTF16(sb, i);
+            }
+            catch (IOException e) {
+                // can't happen
+            }
+            String str1 = sb.toString();
+            byte[] bb = Strings.toUTF8(str1);
+            ByteBuffer buf = ByteBuffer.allocate(bb.length);
+            buf.put(bb);
+            buf.flip();
+            assertEquals(str1, Strings.fromUTF8(buf));
+        }
+    }
+
+    @Test
+    public void test_fromUTF8_bytebuffers_1() {
+        StringBuilder sb = new StringBuilder(30000);
+        for (int i = 0; i < 8192; i++) {
+            try {
+                Strings.appendUTF16(sb, i);
+            }
+            catch (IOException e) {
+                // can't happen
+            }
+        }
+        String str1 = sb.toString();
+        byte[] bb = Strings.toUTF8(str1);
+        List<ByteBuffer> bufList = new ArrayList<>();
+        int offset = 0;
+        int len = 1024;
+        while (offset < bb.length) {
+            if (bb.length - offset <= len) {
+                ByteBuffer buf = ByteBuffer.allocate(bb.length - offset);
+                buf.put(bb, offset, bb.length - offset);
+                buf.flip();
+                bufList.add(buf);
+                break;
+            }
+            ByteBuffer buf = ByteBuffer.allocate(len);
+            buf.put(bb, offset, len);
+            buf.flip();
+            bufList.add(buf);
+            offset += len;
+        }
+        ByteBuffer[] bufArray = new ByteBuffer[bufList.size()];
+        System.out.println("Number of ByteBuffer = " + bufArray.length);
+        assertEquals(str1, Strings.fromUTF8(bufList.toArray(bufArray)));
     }
 
     @Test
