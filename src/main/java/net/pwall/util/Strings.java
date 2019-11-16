@@ -1847,6 +1847,49 @@ public class Strings {
     }
 
     /**
+     * Trim leading characters from a string, where those characters match a supplied {@link IntPredicate} function.
+     *
+     * @param   s           the string to be trimmed
+     * @param   test        the test function
+     * @return  the trimmed string
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static String trimLeading(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
+        int start = 0;
+        int end = s.length();
+        for (;;) {
+            if (start >= end)
+                return emptyString;
+            if (!test.test(s.charAt(start)))
+                break;
+            start++;
+        }
+        return start == 0 ? s : s.substring(start);
+    }
+
+    /**
+     * Trim trailing characters from a string, where those characters match a supplied {@link IntPredicate} function.
+     *
+     * @param   s           the string to be trimmed
+     * @param   test        the test function
+     * @return  the trimmed string
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static String trimTrailing(String s, IntPredicate test) {
+        Objects.requireNonNull(test);
+        int end = s.length();
+        for (;;) {
+            if (end <= 0)
+                return emptyString;
+            if (!test.test(s.charAt(end - 1)))
+                break;
+            end--;
+        }
+        return end == s.length() ? s : s.substring(0, end);
+    }
+
+    /**
      * Trim leading and trailing characters from a {@link CharSequence}, where those characters
      * match a supplied {@link IntPredicate} function.
      *
@@ -1872,6 +1915,51 @@ public class Strings {
     }
 
     /**
+     * Trim leading characters from a {@link CharSequence}, where those characters match a supplied {@link IntPredicate}
+     * function.
+     *
+     * @param   cs          the {@link CharSequence} to be trimmed
+     * @param   test        the test function
+     * @return  the trimmed {@link CharSequence}
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static CharSequence trimLeading(CharSequence cs, IntPredicate test) {
+        Objects.requireNonNull(test);
+        int start = 0;
+        int end = cs.length();
+        for (;;) {
+            if (start >= end)
+                return emptyString;
+            if (!test.test(cs.charAt(start)))
+                break;
+            start++;
+        }
+        return start == 0 ? cs : new SubSequence(cs, start, end);
+    }
+
+    /**
+     * Trim leading characters from a {@link CharSequence}, where those characters match a supplied {@link IntPredicate}
+     * function.
+     *
+     * @param   cs          the {@link CharSequence} to be trimmed
+     * @param   test        the test function
+     * @return  the trimmed {@link CharSequence}
+     * @throws  NullPointerException if either argument is {@code null}
+     */
+    public static CharSequence trimTrailing(CharSequence cs, IntPredicate test) {
+        Objects.requireNonNull(test);
+        int end = cs.length();
+        for (;;) {
+            if (end <= 0)
+                return emptyString;
+            if (!test.test(cs.charAt(end - 1)))
+                break;
+            end--;
+        }
+        return end == cs.length() ? cs : new SubSequence(cs, 0, end);
+    }
+
+    /**
      * Trim leading and trailing whitespace from a string, where white space is determined by
      * {@link Character#isWhitespace(char)}.
      *
@@ -1884,8 +1972,30 @@ public class Strings {
     }
 
     /**
-     * Trim leading and trailing whitespace from a {@link CharSequence}, where white space is
-     * determined by {@link Character#isWhitespace(char)}.
+     * Trim leading whitespace from a string, where white space is determined by {@link Character#isWhitespace(char)}.
+     *
+     * @param   s       the string to be trimmed
+     * @return  the trimmed string
+     * @throws  NullPointerException if the input string is {@code null}
+     */
+    public static String trimLeading(String s) {
+        return trimLeading(s, Character::isWhitespace);
+    }
+
+    /**
+     * Trim trailing whitespace from a string, where white space is determined by {@link Character#isWhitespace(char)}.
+     *
+     * @param   s       the string to be trimmed
+     * @return  the trimmed string
+     * @throws  NullPointerException if the input string is {@code null}
+     */
+    public static String trimTrailing(String s) {
+        return trimTrailing(s, Character::isWhitespace);
+    }
+
+    /**
+     * Trim leading and trailing whitespace from a {@link CharSequence}, where white space is determined by
+     * {@link Character#isWhitespace(char)}.
      *
      * @param   cs      the {@link CharSequence} to be trimmed
      * @return  the trimmed {@link CharSequence}
@@ -1893,6 +2003,30 @@ public class Strings {
      */
     public static CharSequence trim(CharSequence cs) {
         return trim(cs, Character::isWhitespace);
+    }
+
+    /**
+     * Trim leading whitespace from a {@link CharSequence}, where white space is determined by
+     * {@link Character#isWhitespace(char)}.
+     *
+     * @param   cs      the {@link CharSequence} to be trimmed
+     * @return  the trimmed {@link CharSequence}
+     * @throws  NullPointerException if the input {@link CharSequence} is {@code null}
+     */
+    public static CharSequence trimLeading(CharSequence cs) {
+        return trimLeading(cs, Character::isWhitespace);
+    }
+
+    /**
+     * Trim trailing whitespace from a {@link CharSequence}, where white space is determined by
+     * {@link Character#isWhitespace(char)}.
+     *
+     * @param   cs      the {@link CharSequence} to be trimmed
+     * @return  the trimmed {@link CharSequence}
+     * @throws  NullPointerException if the input {@link CharSequence} is {@code null}
+     */
+    public static CharSequence trimTrailing(CharSequence cs) {
+        return trimTrailing(cs, Character::isWhitespace);
     }
 
     /**
