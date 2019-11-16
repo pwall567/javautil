@@ -3,6 +3,10 @@ Added this change log after project was already under way.  Early changes are no
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.2] - 2019-11-16
+### Changed
+- Added more `trim` functions to `Strings`
+
 ## [2.1] - 2019-06-02
 ### Changed
 - Switched to JUnit 5

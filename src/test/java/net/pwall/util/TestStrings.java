@@ -150,6 +150,94 @@ public class TestStrings {
     }
 
     @Test
+    public void test_trim_String() {
+        String s1 = "   xyz ";
+        assertEquals("xyz", Strings.trim(s1));
+        s1 = "abcd ";
+        assertEquals("abcd", Strings.trim(s1));
+        s1 = "     pqr";
+        assertEquals("pqr", Strings.trim(s1));
+        s1 = "--- abcdef ----";
+        assertEquals(" abcdef ", Strings.trim(s1, ch -> ch == '-'));
+        s1 = "AAAA";
+        assertSame(s1, Strings.trim(s1));
+    }
+
+    @Test
+    public void test_trim_CharSequence() {
+        StringBuilder sb1 = new StringBuilder("   xyz ");
+        assertEquals("xyz", Strings.trim(sb1).toString());
+        sb1.setLength(0);
+        sb1.append("abcd ");
+        assertEquals("abcd", Strings.trim(sb1).toString());
+        sb1.setLength(0);
+        sb1.append("     pqr");
+        assertEquals("pqr", Strings.trim(sb1).toString());
+        sb1.setLength(0);
+        sb1.append("--- abcdef ----");
+        assertEquals(" abcdef ", Strings.trim(sb1, ch -> ch == '-').toString());
+        sb1.setLength(0);
+        sb1.append("AAAA");
+        assertSame(sb1, Strings.trim(sb1));
+    }
+
+    @Test
+    public void test_trimLeading_String() {
+        String s1 = "   xyz ";
+        assertEquals("xyz ", Strings.trimLeading(s1));
+        s1 = "abcd ";
+        assertSame(s1, Strings.trimLeading(s1));
+        s1 = "     pqr";
+        assertEquals("pqr", Strings.trimLeading(s1));
+        s1 = "--- abcdef ----";
+        assertEquals(" abcdef ----", Strings.trimLeading(s1, ch -> ch == '-'));
+    }
+
+    @Test
+    public void test_trimLeading_CharSequence() {
+        StringBuilder sb1 = new StringBuilder("   xyz ");
+        assertEquals("xyz ", Strings.trimLeading(sb1).toString());
+        sb1.setLength(0);
+        sb1.append("abcd ");
+        assertSame(sb1, Strings.trimLeading(sb1));
+        sb1.setLength(0);
+        sb1.append("     pqr");
+        assertEquals("pqr", Strings.trimLeading(sb1).toString());
+        sb1.setLength(0);
+        sb1.append("--- abcdef ----");
+        assertEquals(" abcdef ----", Strings.trimLeading(sb1, ch -> ch == '-').toString());
+    }
+
+    @Test
+    public void test_trimTrailing_String() {
+        String s1 = "   xyz ";
+        assertEquals("   xyz", Strings.trimTrailing(s1));
+        s1 = "abcd ";
+        assertEquals("abcd", Strings.trimTrailing(s1));
+        s1 = "     pqr";
+        assertSame(s1, Strings.trimTrailing(s1));
+        s1 = "--- abcdef ----";
+        assertEquals("--- abcdef ", Strings.trimTrailing(s1, ch -> ch == '-'));
+        s1 = "AAAA";
+        assertSame(s1, Strings.trimTrailing(s1));
+    }
+
+    @Test
+    public void test_trimTrailing_CharSequence() {
+        StringBuilder sb1 = new StringBuilder("   xyz ");
+        assertEquals("   xyz", Strings.trimTrailing(sb1).toString());
+        sb1.setLength(0);
+        sb1.append("abcd ");
+        assertEquals("abcd", Strings.trimTrailing(sb1).toString());
+        sb1.setLength(0);
+        sb1.append("     pqr");
+        assertSame(sb1, Strings.trimTrailing(sb1));
+        sb1.setLength(0);
+        sb1.append("--- abcdef ----");
+        assertEquals("--- abcdef ", Strings.trimTrailing(sb1, ch -> ch == '-').toString());
+    }
+
+    @Test
     public void test_split_S_S() {
         String s1 = "the quick brown fox jumps over the lazy dog";
         String s2 = "the";
