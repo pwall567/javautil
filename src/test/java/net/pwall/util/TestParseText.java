@@ -2,7 +2,7 @@
  * @(#) TestParseText.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2017 Peter Wall
+ * Copyright (c) 2017, 2020 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -822,18 +822,29 @@ public class TestParseText {
         pt.skipSpaces();
         assertEquals(3, pt.getIndex());
 
-        pt.skipSpaces();
-        assertEquals(3, pt.getIndex());
+        assertEquals(3, pt.skipSpaces().getIndex());
 
-        pt.skipToSpace();
-        assertEquals(8, pt.getIndex());
+        assertEquals(8, pt.skipToSpace().getIndex());
 
-        pt.skipSpaces();
-        assertTrue(pt.isExhausted());
+        assertTrue(pt.skipSpaces().isExhausted());
 
         pt.reset();
         assertEquals(0, pt.getIndex());
-        pt.skipToEnd();
+        assertTrue(pt.skipToEnd().isExhausted());
+    }
+
+    @Test
+    public void testSkipPast() {
+        ParseText pt = new ParseText(str2);
+        assertEquals(0, pt.getIndex());
+        pt.skipPast(ch -> ch == ' ');
+        assertEquals(3, pt.getIndex());
+
+        assertEquals(3, pt.skipPast(ch -> ch == ' ').getIndex());
+
+        assertEquals(8, pt.skipPast(Character::isDigit).getIndex());
+
+        pt.skipPast(ch -> ch == ' ');
         assertTrue(pt.isExhausted());
     }
 

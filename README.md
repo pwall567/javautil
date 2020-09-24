@@ -10,24 +10,29 @@ Java utility classes, including:
 
 More documentation to follow (Java source has extensive javadoc).
 
-## Maven
+## Dependency Specification
 
-The library is in the Maven Central Repository; the co-ordinates are:
+The latest version of the library is 2.3, and it may be obtained from the Maven Central repository.
 
+### Maven
 ```xml
 <dependency>
   <groupId>net.pwall.util</groupId>
   <artifactId>javautil</artifactId>
-  <version>2.0</version>
+  <version>2.3</version>
 </dependency>
 ```
-
-The above version requires Java 8; for those who need a Java 7 version, use:
-
-```xml
-<dependency>
-  <groupId>net.pwall.util</groupId>
-  <artifactId>javautil</artifactId>
-  <version>1.3</version>
-</dependency>
+### Gradle
+```groovy
+    implementation 'net.pwall.util:javautil:2.3'
 ```
+### Gradle (kts)
+```kotlin
+    implementation("net.pwall.util:javautil:2.3")
+```
+
+The above version requires Java 8; for those who need a Java 7 version, use version 1.3.
+
+Peter Wall
+
+2020-09-23

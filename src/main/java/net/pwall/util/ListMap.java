@@ -185,8 +185,8 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
      */
     @Override
     public void putAll(Map<? extends K, ? extends V> m) {
-        for (K k : m.keySet())
-            put(k, m.get(k));
+        for (Map.Entry<? extends K, ? extends V> e : m.entrySet())
+            put(e.getKey(), e.getValue());
     }
 
     /**
@@ -302,7 +302,7 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
 
         private static final long serialVersionUID = -7610378954393786210L;
 
-        private KK key;
+        private final KK key;
         private VV value;
 
         /**
