@@ -3,6 +3,10 @@ Added this change log after project was already under way.  Early changes are no
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [2.3] - 2020-09-23
+### Changed
+- Added `skipPast` nad `skipTo` functions to `ParseText`
+
 ## [2.2] - 2019-11-16
 ### Changed
 - Added more `trim` functions to `Strings`

@@ -2,7 +2,7 @@
  * @(#) ParseText.java
  *
  * javautil Java Utility Library
- * Copyright (c) 2013, 2014, 2017 Peter Wall
+ * Copyright (c) 2013, 2014, 2017, 2020 Peter Wall
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ package net.pwall.util;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.function.IntPredicate;
 
 /**
  * A class to assist with text parsing.  A {@code ParseText} object contains a string of text to
@@ -1045,6 +1046,22 @@ public class ParseText {
     }
 
     /**
+     * Increment the index past any characters matching a given comparison function.
+     *
+     * @param   comparison  the comparison function
+     * @return              the {@code ParseText} object (for chaining purposes)
+     */
+    public ParseText skipPast(IntPredicate comparison) {
+        int i = index;
+        start = i;
+        int len = text.length();
+        while (i < len && comparison.test(text.charAt(i)))
+            i++;
+        index = i;
+        return this;
+    }
+
+    /**
      * Increment the index past zero or more spaces.
      *
      * @return      the {@code ParseText} object (for chaining purposes)
@@ -1054,6 +1071,22 @@ public class ParseText {
         start = i;
         int len = text.length();
         while (i < len && isSpace(text.charAt(i)))
+            i++;
+        index = i;
+        return this;
+    }
+
+    /**
+     * Increment the index past any characters matching a given comparison function.
+     *
+     * @param   comparison  the comparison function
+     * @return              the {@code ParseText} object (for chaining purposes)
+     */
+    public ParseText skipTo(IntPredicate comparison) {
+        int i = index;
+        start = i;
+        int len = text.length();
+        while (i < len && !comparison.test(text.charAt(i)))
             i++;
         index = i;
         return this;
