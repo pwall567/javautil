@@ -270,6 +270,33 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
     }
 
     /**
+     * Convert the map to {@code String} (usually for diagnostic purposes).
+     *
+     * @return  a string in the form {key=value, ...}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append('{');
+        int n = list.size();
+        if (n > 0) {
+            int i = 0;
+            while (true) {
+                Entry<K, V> e = list.get(i++);
+                if (e.value == this)
+                    sb.append(e.key).append('=').append("(this Map)");
+                else
+                    sb.append(e);
+                if (i >= n)
+                    break;
+                sb.append(',').append(' ');
+            }
+        }
+        sb.append('}');
+        return sb.toString();
+    }
+
+    /**
      * Get an {@link Entry} by index.
      *
      * @param   index   the index
@@ -362,6 +389,16 @@ public class ListMap<K, V> implements Map<K, V>, Serializable {
         @Override
         public int hashCode() {
             return Objects.hash(key, value);
+        }
+
+        /**
+         * Convert the entry to {@code String} (usually for diagnostic purposes).
+         *
+         * @return  a string in the form key=value
+         */
+        @Override
+        public String toString() {
+            return key.toString() + '=' + value.toString();
         }
 
     }
