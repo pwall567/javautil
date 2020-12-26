@@ -272,8 +272,8 @@ public class ChunkedArrayList<E> extends AbstractList<E> implements RandomAccess
     /**
      * Returns the index of the first occurrence of the specified element in this list, or -1
      * if this list does not contain the element.  More formally, returns the lowest index
-     * <tt>i</tt> such that
-     * <tt>(o==null&nbsp;?&nbsp;get(i)==null&nbsp;:&nbsp;o.equals(get(i)))</tt>, or -1 if there
+     * <code>i</code> such that
+     * <code>(o==null&nbsp;?&nbsp;get(i)==null&nbsp;:&nbsp;o.equals(get(i)))</code>, or -1 if there
      * is no such index.
      *
      * @param o {@inheritDoc}
@@ -293,8 +293,8 @@ public class ChunkedArrayList<E> extends AbstractList<E> implements RandomAccess
     /**
      * Returns the index of the last occurrence of the specified element in this list, or -1 if
      * this list does not contain the element.  More formally, returns the highest index
-     * <tt>i</tt> such that
-     * <tt>(o==null&nbsp;?&nbsp;get(i)==null&nbsp;:&nbsp;o.equals(get(i)))</tt>, or -1 if there
+     * <code>i</code> such that
+     * <code>(o==null&nbsp;?&nbsp;get(i)==null&nbsp;:&nbsp;o.equals(get(i)))</code>, or -1 if there
      * is no such index.
      *
      * @param o {@inheritDoc}
