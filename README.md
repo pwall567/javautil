@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/pwall567/javautil.svg?branch=master)](https://travis-ci.org/pwall567/javautil)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Maven Central](https://img.shields.io/maven-central/v/net.pwall.json/javautil?label=Maven%20Central)](https://search.maven.org/search?q=g:%22net.pwall.util%22%20AND%20a:%22javautil%22)
+[![Maven Central](https://img.shields.io/maven-central/v/net.pwall.util/javautil?label=Maven%20Central)](https://search.maven.org/search?q=g:%22net.pwall.util%22%20AND%20a:%22javautil%22)
 
 Java utility classes, including:
 
